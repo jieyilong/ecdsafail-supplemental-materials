@@ -441,7 +441,7 @@
      $\ket{x_R}_X\ket{x_A}_{C_x}$\\
      $\longmapsto\ket{x_R-x_A}_X\ket{x_A}_{C_x}$};
   \draw[wire] (12.0,15.55) -- (SUBX.north);
-  \node[lookup, text width=38mm] (UX) at (20.0,15.55)
+  \node[detailviolet, text width=38mm, minimum height=8mm] (UX) at (20.0,15.55)
     {unload classical bits\\$\ket{x_A}_{C_x}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,15.55) -- (UX.west);
   \node[note, anchor=south west] at (22.7,13.05) {$X=\ket{d_x}$};
@@ -457,7 +457,7 @@
      $\ket{y_R}_Y\ket{y_A}_{C_y}$\\
      $\longmapsto\ket{y_R-y_A}_Y\ket{y_A}_{C_y}$};
   \draw[wire] (12.0,10.65) -- (SUBY.north);
-  \node[lookup, text width=38mm] (UY) at (20.0,10.65)
+  \node[detailviolet, text width=38mm, minimum height=8mm] (UY) at (20.0,10.65)
     {unload classical bits\\$\ket{y_A}_{C_y}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,10.65) -- (UY.west);
   \node[note, anchor=south west] at (22.7,8.15) {$Y=\ket{d_y}$};
@@ -500,7 +500,7 @@
     {load fixed bits\\$C\gets x_A$};
   \node[detail, text width=39mm, minimum height=13mm] (LX3) at (14.1,13.95)
     {$X\gets X-C\pmod p$\\via \texttt{mod\_sub\_vented}};
-  \node[lookup, text width=35mm] (LX4) at (19.0,13.95)
+  \node[detailviolet, text width=35mm, minimum height=8mm] (LX4) at (19.0,13.95)
     {unload $x_A$\\and free $C$};
   \draw[flow] (2.95,13.95) -- (LX1.west);
   \draw[flow] (LX1.east) -- (LX2.west);
@@ -517,7 +517,7 @@
     {load fixed bits\\$C\gets y_A$};
   \node[detail, text width=39mm, minimum height=13mm] (LY3) at (14.1,11.55)
     {$Y\gets Y-C\pmod p$\\via \texttt{mod\_sub\_vented}};
-  \node[lookup, text width=35mm] (LY4) at (19.0,11.55)
+  \node[detailviolet, text width=35mm, minimum height=8mm] (LY4) at (19.0,11.55)
     {unload $y_A$\\and free $C$};
   \draw[flow] (2.95,11.55) -- (LY1.west);
   \draw[flow] (LY1.east) -- (LY2.west);
@@ -528,26 +528,50 @@
   \draw[flow] (LY4.east) -- (23.0,11.55);
 
   % Three implementation mechanisms.
-  \node[detailorange, text width=82mm, minimum height=49mm] (C1) at (6.7,6.55)
-    {\textbf{Classical-addend specialization}\\[1.5mm]
-     In submission \texttt{8e9c9a2}, $(x_A,y_A)$ is classically known. Each coordinate is copied into $C$ with classically controlled $X$ gates, used by one reversible subtraction, and XOR-unloaded before $C$ is released. Thus the two $256$-qubit copies are never simultaneously live.};
-
-  \node[detail, text width=82mm, minimum height=49mm] (C2) at (17.15,6.55)
-    {\textbf{Pseudo-Mersenne modular correction}\\[1.5mm]
-     For \texttt{secp256k1},
+  \node[detailorange, text width=82mm, minimum height=59mm, font=\small] (C1) at (6.7,6.55)
+    {{\normalsize\bfseries Classical-addend specialization}\\[1.2mm]
+     For either classical coordinate $c\in\{x_A,y_A\}$, each known bit loads a clean temporary qubit by
      \[
-       p=2^{256}-F,\qquad F=2^{32}+977.
+       \ket{0}_{C_i}\xrightarrow{\,X^{c_i}\,}\ket{c_i}_{C_i}.
      \]
-     The overflow or borrow correction can therefore be folded through the low $53$ bits rather than by a second full-width reduction. The final conditional correction compares a selected $19$-bit most-significant window.};
-
-  \node[detailviolet, text width=82mm, minimum height=49mm] (C3) at (27.6,6.55)
-    {\textbf{Vented carry cleanup}\\[1.5mm]
-     The adder stores selected carries in temporary ancillas during the forward pass, then removes them by $X$-basis measurement and conditional phase feedback:
+     The loaded register supplies the operand for the target reversible map
      \[
-       \ket{c}\ \xrightarrow{\ H,\,M_X\ }\ m,
-       \qquad \mathrm{CZ}^{m}\ \text{restores the phase}.
+       \ket{r}\ket{c}_C\longmapsto
+       \ket{r-c\bmod p}\ket{c}_C.
      \]
-     Each vent exchanges one temporary qubit for one fewer carry-uncompute Toffoli, which is favorable in this off-peak phase.};
+     Applying the same $X^{c_i}$ gates again returns $C$ to $\ket{0}^{\otimes256}$. The $x_A$ and $y_A$ calls are sequential, so only one coordinate copy is live.};
+
+  \node[detail, text width=82mm, minimum height=59mm, font=\small] (C2) at (17.15,6.55)
+    {{\normalsize\bfseries Pseudo-Mersenne modular correction}\\[1.2mm]
+     Let $b=[y<x]$ be the subtraction borrow and
+     \[
+       r_0=(y-x)\bmod 2^{256}.
+     \]
+     Since $p=2^{256}-F$ with $F=2^{32}+977$, the desired residue is
+     \[
+       r=r_0-bF\pmod{2^{256}}.
+     \]
+     The implementation applies this correction to
+     $\operatorname{low}_{53}(r_0)$, where $53=\operatorname{bitlen}(F)+20$.
+     Cleanup of $b$ then compares only
+     $\operatorname{MSB}_{19}(y)$ and $\operatorname{MSB}_{19}(x)$; these truncations are validated on the benchmark support rather than proved for all inputs.};
+
+  \node[detailviolet, text width=82mm, minimum height=59mm, font=\small] (C3) at (27.6,6.55)
+    {{\normalsize\bfseries Vented carry cleanup}\\[-0.3mm]
+     {\itshape Gidney-style measurement-based uncomputation}\\[1.2mm]
+     A forward Toffoli stores $c=a\wedge b$ in a clean ancilla:
+     {\normalsize
+     \[
+       \sum_{a,b}\alpha_{ab}\ket{a,b}\ket{0}
+       \longmapsto
+       \sum_{a,b}\alpha_{ab}\ket{a,b}\ket{ab}.
+     \]}
+     Measuring the ancilla in the $X$ basis with result $m\in\{0,1\}$ leaves
+     {\normalsize
+     \[
+       \sum_{a,b}\alpha_{ab}(-1)^{mab}\ket{a,b}.
+     \]}
+     The classically conditioned correction $\mathrm{CZ}^{m}_{a,b}$ removes this phase exactly. This is the temporary-logical-AND cleanup: the ancilla is discarded and the reverse carry-uncompute Toffoli is omitted.};
 
   \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,2.0)
     {\textbf{Interpretation.} Phase 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
@@ -967,7 +991,90 @@
 \newpage
 
 % ============================================================================
-% Page 12: phase 5, reverse dialog-GCD multiplication
+% Page 12: phase 4 detail, streamed pseudo-Mersenne square
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Phase 4 detail: streamed pseudo-Mersenne squaring};
+  \node[font=\large] at (17.15,17.28)
+    {Three half-size symmetric squares implement $X\gets X-\lambda^2\pmod p$ without retaining a generic $512$-bit product.};
+
+  % Algebra panel.
+  \draw[black!55, line width=0.8pt, rounded corners=1pt]
+    (1.25,6.15) rectangle (16.90,16.50);
+  \node[font=\large\bfseries, anchor=west] at (1.70,15.98)
+    {Three-square decomposition};
+  \node[note, text width=14.4cm, align=center] at (9.08,14.92)
+    {To avoid confusion with the selected elliptic-curve addend $A$, denote the temporary products by $U$, $V$, and $W$:};
+  \node[font=\large] at (9.08,13.88)
+    {$\lambda=L+2^{128}H,\qquad U=L^2,\qquad V=H^2,\qquad W=(L+H)^2.$};
+  \node[font=\large] at (9.08,12.65)
+    {$W-U-V=2LH$};
+  \node[font=\large] at (9.08,11.42)
+    {$\lambda^2=U+2^{128}(W-U-V)+2^{256}V.$};
+  \node[font=\large] at (9.08,10.17)
+    {$p=2^{256}-F\ \Longrightarrow\ 2^{256}\equiv F\pmod p,$};
+  \node[font=\large] at (9.08,9.08)
+    {$\lambda^2\equiv U+2^{128}(W-U-V)+FV\pmod p.$};
+
+  \node[detailorange, text width=40mm, minimum height=17mm] at (3.85,7.28)
+    {$W$ contribution\\[1mm]
+     $X\gets X-2^{128}W$};
+  \node[detailorange, text width=43mm, minimum height=17mm] at (9.05,7.28)
+    {$U$ contributions\\[1mm]
+     $X\gets X-U+2^{128}U$};
+  \node[detailorange, text width=45mm, minimum height=17mm] at (14.35,7.28)
+    {$V$ contributions\\[1mm]
+     $X\gets X+2^{128}V-FV$};
+
+  % Reversible schedule panel.
+  \draw[black!55, line width=0.8pt, rounded corners=1pt]
+    (17.35,6.15) rectangle (33.05,16.50);
+  \node[font=\large\bfseries, anchor=west] at (17.80,15.98)
+    {Reversible build--apply--unbuild schedule};
+
+  \node[detail, text width=137mm, minimum height=9mm] at (25.20,14.72)
+    {\textbf{1. Split and prepare.} View $Y=\lambda$ as the slices $L$ and $H$; reversibly build the $129$-bit sum $S=L+H$.};
+  \node[detailviolet, text width=137mm, minimum height=9mm] at (25.20,13.20)
+    {\textbf{2. Sum square.} Build $W=S^2$, apply $-2^{128}W$ to $X$, and reverse the squarer to return the $W$ register to zero.};
+  \node[detail, text width=137mm, minimum height=9mm] at (25.20,11.68)
+    {\textbf{3. Low-half square.} Build $U=L^2$, apply $-U+2^{128}U$ to $X$, and unbuild $U$.};
+  \node[detailviolet, text width=137mm, minimum height=9mm] at (25.20,10.16)
+    {\textbf{4. High-half square.} Build $V=H^2$, apply $+2^{128}V-FV$ to $X$, and unbuild $V$.};
+  \node[detail, text width=137mm, minimum height=9mm] at (25.20,8.64)
+    {\textbf{5. Clean the preparation.} Reverse the addition that formed $S=L+H$; all square work registers return to $\ket{0}$.};
+  \node[detailgreen, text width=137mm, minimum height=10mm] at (25.20,7.08)
+    {\textbf{Result:} $Y=\lambda$ is preserved and
+     $X_{\mathrm{out}}=X_{\mathrm{in}}-\lambda^2=x_R+2x_A-\lambda^2=x_A-x_{R'}\pmod p$.};
+
+  % Resource-saving mechanisms.
+  \draw[black!50, line width=0.7pt, rounded corners=1pt]
+    (1.25,1.05) rectangle (33.05,5.55);
+  \node[font=\large\bfseries, anchor=west] at (1.70,5.13)
+    {Why this construction is specialized};
+  \node[detail, text width=63mm, minimum height=24mm] at (5.10,3.15)
+    {\textbf{Symmetric squaring}\\[1mm]
+     Diagonal terms are copied directly; only $n(n-1)/2$ unordered cross terms are formed.};
+  \node[detailgreen, text width=63mm, minimum height=24mm] at (13.15,3.15)
+    {\textbf{Streamed products}\\[1mm]
+     Only one of $U$, $V$, or $W$ is live at a time; each is accumulated into $X$ and immediately uncomputed.};
+  \node[detailorange, text width=63mm, minimum height=24mm] at (21.20,3.15)
+    {\textbf{Pseudo-Mersenne fold}\\[1mm]
+     Terms crossing bit $255$ are folded back with $2^{256}\equiv F\pmod p$ instead of using generic reduction.};
+  \node[detailviolet, text width=63mm, minimum height=24mm] at (29.25,3.15)
+    {\textbf{Sparse constant}\\[1mm]
+     $F=2^{32}+2^{10}-2^6+2^4+1$, so $FV$ uses five shifted additions or subtractions.};
+
+  \node[note, text width=31cm, align=center, font=\small\itshape] at (17.15,0.55)
+    {Source correspondence: \texttt{mod\_square\_sub\_pm\_secp256k1\_symmetric}; the source names $U$, $V$, and $W$ as \texttt{a\_prod}, \texttt{b\_prod}, and \texttt{c\_prod}.};
+\end{tikzpicture}
+
+\newpage
+
+% ============================================================================
+% Page 13: phase 5, reverse dialog-GCD multiplication
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -1036,7 +1143,7 @@
 \newpage
 
 % ============================================================================
-% Page 13: phase 6, recover affine output
+% Page 14: phase 6, recover affine output
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
