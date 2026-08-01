@@ -6,6 +6,13 @@
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 
+\AddToHook{shipout/foreground}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\small, text=black!55]
+      at ([xshift=-5mm,yshift=3mm]current page.south east) {\thepage};
+  \end{tikzpicture}%
+}
+
 \newcommand{\ket}[1]{\left\lvert #1\right\rangle}
 \definecolor{gateblue}{RGB}{242,246,251}
 \definecolor{lookorange}{RGB}{255,245,231}
@@ -169,7 +176,251 @@
 \newpage
 
 % ============================================================================
-% Page 3: phase 1, coordinate differences
+% Page 2: generic in-place point addition and its Shor-window interpretation
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Generic in-place mixed addition: $R'=R+A$};
+  \node[font=\large] at (17.15,17.22)
+    {Seven reversible register updates implement the affine group law while recycling $X$ and $Y$.};
+
+  % Algorithm panel.
+  \draw[black, line width=0.9pt, rounded corners=1pt]
+    (1.25,1.30) rectangle (20.55,16.45);
+  \node[font=\large\bfseries, anchor=west] at (1.70,15.95)
+    {In-place addition of the selected addend $A$};
+  \draw[black, line width=0.7pt] (1.55,15.48) -- (20.25,15.48);
+
+  \node[font=\normalsize, anchor=west] at (1.75,14.92)
+    {\textbf{Input:} accumulator $R=(x_R,y_R)$ and selected addend $A=(x_A,y_A)$ in $E(\mathbb F_p)$.};
+  \node[font=\normalsize, anchor=west] at (1.75,14.35)
+    {\textbf{Generic-case assumptions:} $x_R\neq x_A$ and $x_A\neq x_{R'}$.};
+  \node[font=\normalsize, anchor=west] at (1.75,13.78)
+    {\textbf{Output:} $R'=(x_{R'},y_{R'})=R+A$ is returned in the same $X,Y$ registers.};
+
+  \foreach \num/\yy/\op/\comment in {
+    1/12.75/{X\gets x_R-x_A;\quad Y\gets y_R-y_A}/{X=d_x,\ Y=d_y},
+    2/11.62/{Y\gets YX^{-1}}/{Y=\lambda},
+    3/10.49/{X\gets X+3x_A}/{X=x_R+2x_A},
+    4/9.36/{X\gets X-Y^2}/{X=x_A-x_{R'}},
+    5/8.23/{Y\gets YX}/{Y=\lambda(x_A-x_{R'})},
+    6/7.10/{Y\gets Y-y_A}/{Y=y_{R'}},
+    7/5.97/{X\gets x_A-X}/{X=x_{R'}}
+  }{
+    \node[font=\large\bfseries, anchor=east] at (2.15,\yy) {\num.};
+    \node[font=\large, anchor=west] at (2.45,\yy) {$\op$};
+    \node[font=\normalsize, anchor=east, text=black!75] at (19.85,\yy)
+      {$\triangleright\ \comment$};
+  }
+
+  \draw[black!45, line width=0.7pt, rounded corners=1pt, fill=gateblue]
+    (1.65,1.80) rectangle (20.15,4.82);
+  \node[font=\large\bfseries, anchor=west] at (2.00,4.42)
+    {Algebraic check};
+  \node[font=\large] at (10.90,3.58)
+    {$\displaystyle
+      \lambda=\frac{y_R-y_A}{x_R-x_A},\qquad
+      x_{R'}=\lambda^2-x_R-x_A,\qquad
+      y_{R'}=\lambda(x_A-x_{R'})-y_A.$};
+  \node[font=\normalsize, text width=17.2cm, align=center] at (10.90,2.60)
+    {After Steps 3--4,
+     $X=(x_R-x_A)+3x_A-\lambda^2=x_A-x_{R'}$; Steps 5--7 then recover
+     $y_{R'}$ and $x_{R'}$ without allocating separate output-coordinate registers.};
+
+  % Shor-window context panel.
+  \draw[black!55, line width=0.8pt, rounded corners=1pt]
+    (21.05,1.30) rectangle (33.45,16.45);
+  \node[font=\large\bfseries] at (27.25,15.88)
+    {Use inside windowed Shor};
+  \node[font=\normalsize, text width=11.2cm, align=center] at (27.25,15.08)
+    {The window word selects the addend $A_j$; the lookup is used directly by the mixed-addition kernel and then uncomputed.};
+
+  % Coherent address, lookup, and accumulator update.  This mirrors page 1.
+  \node[lab, anchor=east] at (22.55,13.15) {$\ket{k_j}$};
+  \draw[wire] (22.70,13.15) -- (32.70,13.15);
+  \node[lookup, text width=42mm, minimum height=13mm] (WLOOK) at (27.25,13.15)
+    {QROM lookup/use/unlookup\\$A_j=T_P^j[k_j]$};
+  \node[note, anchor=west] at (30.05,13.72) {address preserved};
+
+  \node[lab, anchor=east] at (22.55,10.35) {$\ket{R}$};
+  \draw[wire] (22.70,10.35) -- (32.70,10.35);
+  \node[add, text width=40mm, minimum height=17mm] (PADD) at (27.25,10.35)
+    {mixed point addition\\$R'=R+A_j$};
+  \draw[wire] (WLOOK.south) -- (PADD.north);
+  \node[lab, anchor=south west] at (31.10,10.53) {$\ket{R'}$};
+
+  \node[detailorange, text width=103mm, minimum height=28mm] at (27.25,7.35)
+    {$A_j=(x_{A_j},y_{A_j})$ is the elliptic-curve point selected for this call. For a $w$-bit window,
+     \[
+       A_j=T_P^j[k_j],\qquad
+       T_P^j[i]=[\,i\,2^{jw}\,]P
+     \]
+     for a $P$-scalar window, with an analogous table $T_Q^j$ for the public-point scalar.};
+
+  \node[detailgreen, text width=103mm, minimum height=26mm] at (27.25,4.30)
+    {The complete coherent map is
+     \[
+       \ket{k_j}\ket{R}\ket{0}_{\mathrm{work}}
+       \longmapsto
+       \ket{k_j}\ket{R'}\ket{0}_{\mathrm{work}},\qquad
+       R'=R+T_P^j[k_j].
+     \]
+     For $n=256$ and $w=16$, each scalar contains $16$ such windows.};
+
+  \node[note, text width=11.2cm, align=center] at (27.25,1.92)
+    {$A_j$ is not an unexplained long-lived register: its coordinates are temporary QROM work data and are returned to zero. ECDSA.Fail supplies $A$ classically; full Shor must validate the coherent interface.};
+
+  \node[note, text width=31cm, align=center, font=\small\itshape] at (17.15,0.65)
+    {Notation is consistent across the deck: $A$ is the selected addend, $R$ is the input accumulator, and $R'=R+A$ is the updated accumulator.};
+\end{tikzpicture}
+
+\newpage
+
+% ============================================================================
+% Page 3: inside one point-addition box
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {From the point-addition algorithm to the \texttt{8e9c9a2} pipeline};
+  \node[font=\large] at (17.15,17.35)
+    {Example: $+[u_1 2^{16}]P$, with selected addend $A=[u_1 2^{16}]P$ and output $R'=R+A$};
+
+  % Window address and three local lookups.
+  \node[lab, anchor=east] at (2.0,15.6) {window: $\ket{u_j}$};
+  \draw[wire] (2.15,15.6) -- (33.2,15.6);
+  \draw[wire] (2.55,15.46) -- (2.82,15.74);
+  \node[font=\small] at (2.68,15.98) {$16$};
+  \node[note, anchor=west] at (7.0,16.05) {coherent address (preserved)};
+  \node[lookup, text width=35mm] (QA) at (4.4,15.6)
+    {QROM lookup/unlookup\\$A=(x_A,y_A)$};
+  \node[lookup, text width=35mm] (Q3) at (14.7,15.6)
+    {QROM lookup/unlookup\\$3x_A$};
+  \node[lookup, text width=35mm] (QB) at (30.15,15.6)
+    {QROM lookup/unlookup\\$A=(x_A,y_A)$};
+
+  % X and Y coordinate buses.
+  \node[lab, anchor=east] at (1.55,11.35) {$X:\ \ket{x_R}$};
+  \node[lab, anchor=east] at (1.55,8.75) {$Y:\ \ket{y_R}$};
+  \draw[wire] (2.15,11.35) -- (33.2,11.35);
+  \draw[wire] (2.15,8.75) -- (33.2,8.75);
+  \draw[wire] (2.55,11.21) -- (2.82,11.49);
+  \draw[wire] (2.55,8.61) -- (2.82,8.89);
+  \node[font=\small] at (2.68,11.73) {$256$};
+  \node[font=\small] at (2.68,9.13) {$256$};
+  \node[note] at (4.8,12.0) {quantum accumulator $R=(x_R,y_R)$};
+
+  % Six source-level phases.
+  \node[phase] (S1) at (4.4,10.05)
+    {\textbf{1. Coordinate differences}\\[-0.5mm]
+     \textit{\scriptsize Algorithm line 1}\\[1.2mm]
+     $X\gets x_R-x_A=d_x$\\
+     $Y\gets y_R-y_A=d_y$\\[1mm]
+     consume $A$, then unlookup};
+  \node[phaseviolet] (S2) at (9.55,10.05)
+    {\textbf{2. Dialog-GCD division}\\[-0.5mm]
+     \textit{\scriptsize Algorithm line 2}\\[1.2mm]
+     $Y\gets d_y/d_x=\lambda$\\
+     $X=d_x$\\[1mm]
+     clean GCD workspace};
+  \node[phase] (S3) at (14.7,10.05)
+    {\textbf{3. Prepare $X$ workspace}\\[-0.5mm]
+     \textit{\scriptsize Algorithm line 3}\\[1.2mm]
+     $X\gets d_x+3x_A$\\
+     $\phantom{X}=x_R+2x_A$\\
+     $Y=\lambda$, then unlookup $3x_A$};
+  \node[phaseorange] (S4) at (19.85,10.05)
+    {\textbf{4. Specialized square}\\[-0.5mm]
+     \textit{\scriptsize Algorithm line 4}\\[1.2mm]
+     $X\gets X-\lambda^2$\\
+     $\phantom{X}=x_A-x_{R'}$\\
+     $Y=\lambda$};
+  \node[phaseviolet] (S5) at (25.0,10.05)
+    {\textbf{5. Reverse dialog-GCD}\\[-0.5mm]
+     \textit{\scriptsize Algorithm line 5}\\[1.2mm]
+     $Y\gets\lambda X$\\
+     $\phantom{Y}=\lambda(x_A-x_{R'})$\\
+     $X=x_A-x_{R'}$\\
+     erase $\lambda$ and transcript};
+  \node[phase] (S6) at (30.15,10.05)
+    {\textbf{6. Recover output}\\[-0.5mm]
+     \textit{\scriptsize Algorithm lines 6--7}\\[1.2mm]
+     $Y\gets Y-y_A=y_{R'}$\\
+     $X\gets x_A-X=x_{R'}$\\[1mm]
+     unlookup $A$; output $R'$};
+
+  % Plain input wires stop at the boundary of the first pipeline stage.
+  \draw[wire] (1.70,11.35) -- (2.05,11.35);
+  \draw[wire] (1.70,8.75) -- (2.05,8.75);
+
+  \draw[wire] (QA.south) -- (S1.north);
+  \draw[wire] (Q3.south) -- (S3.north);
+  \draw[wire] (QB.south) -- (S6.north);
+  \node[note, anchor=west] at (32.55,11.72) {$X=x_{R'}$};
+  \node[note, anchor=west] at (32.55,9.12) {$Y=y_{R'}$};
+
+  % Live-register state table.
+  \draw[black!50, line width=0.7pt, rounded corners=1pt]
+    (1.6,4.85) rectangle (32.7,7.55);
+  \node[font=\large\bfseries, anchor=west] at (2.0,7.2)
+    {Live quantum-register state};
+
+  \foreach \xx/\head/\xval/\yval in {
+    5.0/DIFFERENCES/{x_R-x_A}/{y_R-y_A},
+    10.1/DIVISION/{x_R-x_A}/{\lambda},
+    15.2/PREPARE/{x_R+2x_A}/{\lambda},
+    20.3/SQUARE/{x_A-x_{R'}}/{\lambda},
+    25.4/MULTIPLY/{x_A-x_{R'}}/{\lambda(x_A-x_{R'})},
+    30.5/OUTPUT/{x_{R'}}/{y_{R'}}}{
+      \node[font=\small\bfseries] at (\xx,6.75) {\head};
+      \node[font=\normalsize] at (\xx,6.02) {$\xval$};
+      \node[font=\normalsize] at (\xx,5.35) {$\yval$};
+  }
+  \node[font=\normalsize\bfseries, anchor=east] at (3.5,6.02) {$X$ register};
+  \node[font=\normalsize\bfseries, anchor=east] at (3.5,5.35) {$Y$ register};
+  \foreach \xa/\xb in {6.3/8.8,11.4/13.9,16.5/19.0,21.6/24.1,26.7/29.2}{
+    \draw[flow, black!60] (\xa,5.68) -- (\xb,5.68);
+  }
+
+  % Source-level mapping, aligned with the six pipeline columns.
+  \draw[black, line width=0.8pt, rounded corners=1pt]
+    (2.0,1.15) rectangle (32.3,4.15);
+  \node[font=\large\bfseries, anchor=west] at (2.35,3.78)
+    {Source phases in submission \texttt{8e9c9a2} (same columns as the pipeline)};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (4.4,2.55)
+    {\textbf{Coordinate differences}\\
+     \texttt{tlm\_coord\_x\_sub}\\
+     \texttt{tlm\_coord\_y\_sub}};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (9.55,2.55)
+    {\textbf{Dialog-GCD division}\\
+     \texttt{tlm\_inverse}};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (14.7,2.55)
+    {\textbf{Prepare $X$ workspace}\\
+     \texttt{tlm\_coord\_add3x}};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (19.85,2.55)
+    {\textbf{Specialized square}\\
+     \texttt{tlm\_square}};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (25.0,2.55)
+    {\textbf{Reverse dialog-GCD}\\
+     \texttt{tlm\_forward\_multiply}};
+  \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (29.85,2.55)
+    {\textbf{Recover output}\\
+     \texttt{tlm\_coord\_y\_sub\_final}\\
+     \texttt{tlm\_coord\_rsub\_final}};
+
+  \node[note, text width=31cm, align=center] at (17.15,0.82)
+    {Pipelines 2 and 5 share the dialog-GCD transcript machinery: the first produces $\lambda$, while the second replays it to multiply by $X$ and erase the transcript.};
+  \node[note, text width=31cm, align=center, font=\small\itshape] at (17.15,0.40)
+    {In ECDSA.Fail, $(x_A,y_A)$ are classical input bits; a full windowed-Shor circuit must separately implement and validate the coherent QROM interface.};
+\end{tikzpicture}
+
+\newpage
+
+% ============================================================================
+% Page 4: phase 1, coordinate differences
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -228,7 +479,87 @@
 \newpage
 
 % ============================================================================
-% Page 4: phase 2, dialog-GCD division
+% Page 5: phase 1 implementation details
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Phase 1 detail: optimized coordinate subtraction};
+  \node[font=\large] at (17.15,17.20)
+    {The group-law step is conventional; the implementation reduces its live width and nonlinear cost.};
+
+  % The two source-level calls execute sequentially and reuse the same temporary register.
+  \node[font=\large\bfseries, anchor=west] at (2.0,15.75)
+    {Serialized use of one transient coordinate register};
+
+  \node[lab, anchor=east] at (2.9,13.95) {$X:\ \ket{x_R}$};
+  \node[lookup, text width=31mm] (LX1) at (5.1,13.95)
+    {allocate $C$\\$256$ qubits};
+  \node[lookup, text width=34mm] (LX2) at (9.3,13.95)
+    {load fixed bits\\$C\gets x_A$};
+  \node[detail, text width=39mm, minimum height=13mm] (LX3) at (14.1,13.95)
+    {$X\gets X-C\pmod p$\\via \texttt{mod\_sub\_vented}};
+  \node[lookup, text width=35mm] (LX4) at (19.0,13.95)
+    {unload $x_A$\\and free $C$};
+  \draw[flow] (2.95,13.95) -- (LX1.west);
+  \draw[flow] (LX1.east) -- (LX2.west);
+  \draw[flow] (LX2.east) -- (LX3.west);
+  \draw[flow] (LX3.east) -- (LX4.west);
+  \node[detailgreen, text width=48mm, minimum height=13mm] at (25.6,13.95)
+    {output of the first call\\$X=\ket{x_R-x_A}=\ket{d_x}$};
+  \draw[flow] (LX4.east) -- (23.0,13.95);
+
+  \node[lab, anchor=east] at (2.9,11.55) {$Y:\ \ket{y_R}$};
+  \node[lookup, text width=31mm] (LY1) at (5.1,11.55)
+    {reallocate $C$\\same $256$ slots};
+  \node[lookup, text width=34mm] (LY2) at (9.3,11.55)
+    {load fixed bits\\$C\gets y_A$};
+  \node[detail, text width=39mm, minimum height=13mm] (LY3) at (14.1,11.55)
+    {$Y\gets Y-C\pmod p$\\via \texttt{mod\_sub\_vented}};
+  \node[lookup, text width=35mm] (LY4) at (19.0,11.55)
+    {unload $y_A$\\and free $C$};
+  \draw[flow] (2.95,11.55) -- (LY1.west);
+  \draw[flow] (LY1.east) -- (LY2.west);
+  \draw[flow] (LY2.east) -- (LY3.west);
+  \draw[flow] (LY3.east) -- (LY4.west);
+  \node[detailgreen, text width=48mm, minimum height=13mm] at (25.6,11.55)
+    {output of the second call\\$Y=\ket{y_R-y_A}=\ket{d_y}$};
+  \draw[flow] (LY4.east) -- (23.0,11.55);
+
+  % Three implementation mechanisms.
+  \node[detailorange, text width=82mm, minimum height=49mm] (C1) at (6.7,6.55)
+    {\textbf{Classical-addend specialization}\\[1.5mm]
+     In submission \texttt{8e9c9a2}, $(x_A,y_A)$ is classically known. Each coordinate is copied into $C$ with classically controlled $X$ gates, used by one reversible subtraction, and XOR-unloaded before $C$ is released. Thus the two $256$-qubit copies are never simultaneously live.};
+
+  \node[detail, text width=82mm, minimum height=49mm] (C2) at (17.15,6.55)
+    {\textbf{Pseudo-Mersenne modular correction}\\[1.5mm]
+     For \texttt{secp256k1},
+     \[
+       p=2^{256}-F,\qquad F=2^{32}+977.
+     \]
+     The overflow or borrow correction can therefore be folded through the low $53$ bits rather than by a second full-width reduction. The final conditional correction compares a selected $19$-bit most-significant window.};
+
+  \node[detailviolet, text width=82mm, minimum height=49mm] (C3) at (27.6,6.55)
+    {\textbf{Vented carry cleanup}\\[1.5mm]
+     The adder stores selected carries in temporary ancillas during the forward pass, then removes them by $X$-basis measurement and conditional phase feedback:
+     \[
+       \ket{c}\ \xrightarrow{\ H,\,M_X\ }\ m,
+       \qquad \mathrm{CZ}^{m}\ \text{restores the phase}.
+     \]
+     Each vent exchanges one temporary qubit for one fewer carry-uncompute Toffoli, which is favorable in this off-peak phase.};
+
+  \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,2.0)
+    {\textbf{Interpretation.} Phase 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
+
+  \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.70)
+    {Source correspondence: the sequential \texttt{coord\_addsub} calls and \texttt{mod\_sub\_vented} implementation in submission \texttt{8e9c9a2}.};
+\end{tikzpicture}
+
+\newpage
+
+% ============================================================================
+% Page 6: phase 2, dialog-GCD division
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -303,7 +634,7 @@
 \newpage
 
 % ============================================================================
-% Detail page: Jump-2 step used inside phase 2
+% Page 7: Jump-2 step used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -377,7 +708,7 @@
 \newpage
 
 % ============================================================================
-% Detail page: K5 codec and streamed replay used inside phase 2
+% Page 8: K5 codec and streamed replay used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -459,7 +790,7 @@
 \newpage
 
 % ============================================================================
-% Detail page: width scheduling and temporary reuse used inside phase 2
+% Page 9: width scheduling and temporary reuse used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -521,7 +852,7 @@
 \newpage
 
 % ============================================================================
-% Page 5: phase 3, prepare X workspace
+% Page 10: phase 3, prepare X workspace
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -573,129 +904,7 @@
 \newpage
 
 % ============================================================================
-% Page 2: inside one point-addition box
-% ============================================================================
-\begin{tikzpicture}[x=1cm,y=1cm]
-  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
-
-  \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Inside one window-controlled mixed point addition};
-  \node[font=\large] at (17.15,17.35)
-    {Example: $+[u_1 2^{16}]P$, with selected addend $A=[u_1 2^{16}]P$ and output $R'=R+A$};
-
-  % Window address and three local lookups.
-  \node[lab, anchor=east] at (2.0,15.6) {window: $\ket{u_j}$};
-  \draw[wire] (2.15,15.6) -- (33.2,15.6);
-  \draw[wire] (2.55,15.46) -- (2.82,15.74);
-  \node[font=\small] at (2.68,15.98) {$16$};
-  \node[note, anchor=west] at (7.0,16.05) {coherent address (preserved)};
-  \node[lookup, text width=35mm] (QA) at (4.4,15.6)
-    {QROM lookup/unlookup\\$A=(x_A,y_A)$};
-  \node[lookup, text width=35mm] (Q3) at (14.7,15.6)
-    {QROM lookup/unlookup\\$3x_A$};
-  \node[lookup, text width=35mm] (QB) at (30.15,15.6)
-    {QROM lookup/unlookup\\$A=(x_A,y_A)$};
-
-  % X and Y coordinate buses.
-  \node[lab, anchor=east] at (1.9,11.35) {$X:\ \ket{x_R}$};
-  \node[lab, anchor=east] at (1.9,8.75) {$Y:\ \ket{y_R}$};
-  \draw[wire] (2.15,11.35) -- (33.2,11.35);
-  \draw[wire] (2.15,8.75) -- (33.2,8.75);
-  \draw[wire] (2.55,11.21) -- (2.82,11.49);
-  \draw[wire] (2.55,8.61) -- (2.82,8.89);
-  \node[font=\small] at (2.68,11.73) {$256$};
-  \node[font=\small] at (2.68,9.13) {$256$};
-  \node[note] at (4.8,12.0) {quantum accumulator $R=(x_R,y_R)$};
-
-  % Six source-level phases.
-  \node[phase] (S1) at (4.4,10.05)
-    {\textbf{1. Coordinate differences}\\[2mm]
-     $X\gets x_R-x_A=d_x$\\
-     $Y\gets y_R-y_A=d_y$\\[1mm]
-     consume $A$, then unlookup};
-  \node[phaseviolet] (S2) at (9.55,10.05)
-    {\textbf{2. Dialog-GCD division}\\[2mm]
-     $Y\gets d_y/d_x=\lambda$\\
-     $X=d_x$\\[1mm]
-     clean GCD workspace};
-  \node[phase] (S3) at (14.7,10.05)
-    {\textbf{3. Prepare $X$ workspace}\\[2mm]
-     $X\gets d_x+3x_A$\\
-     $\phantom{X}=x_R+2x_A$\\
-     $Y=\lambda$, then unlookup $3x_A$};
-  \node[phaseorange] (S4) at (19.85,10.05)
-    {\textbf{4. Specialized square}\\[2mm]
-     $X\gets X-\lambda^2$\\
-     $\phantom{X}=x_A-x_{R'}$\\
-     $Y=\lambda$};
-  \node[phaseviolet] (S5) at (25.0,10.05)
-    {\textbf{5. Reverse dialog-GCD}\\[2mm]
-     $Y\gets\lambda X$\\
-     $\phantom{Y}=\lambda(x_A-x_{R'})$\\
-     $X=x_A-x_{R'}$\\
-     erase $\lambda$ and transcript};
-  \node[phase] (S6) at (30.15,10.05)
-    {\textbf{6. Recover output}\\[2mm]
-     $Y\gets Y-y_A=y_{R'}$\\
-     $X\gets x_A-X=x_{R'}$\\[1mm]
-     unlookup $A$; output $R'$};
-
-  \draw[wire] (QA.south) -- (S1.north);
-  \draw[wire] (Q3.south) -- (S3.north);
-  \draw[wire] (QB.south) -- (S6.north);
-  \node[note, anchor=east] at (32.9,12.0) {$X=x_{R'}$};
-  \node[note, anchor=east] at (32.9,8.15) {$Y=y_{R'}$};
-
-  % Live-register state table.
-  \draw[black!50, line width=0.7pt, rounded corners=1pt]
-    (1.6,4.85) rectangle (32.7,7.55);
-  \node[font=\large\bfseries, anchor=west] at (2.0,7.2)
-    {Live quantum-register state};
-
-  \foreach \xx/\head/\xval/\yval in {
-    5.0/DIFFERENCES/{x_R-x_A}/{y_R-y_A},
-    10.1/DIVISION/{x_R-x_A}/{\lambda},
-    15.2/PREPARE/{x_R+2x_A}/{\lambda},
-    20.3/SQUARE/{x_A-x_{R'}}/{\lambda},
-    25.4/MULTIPLY/{x_A-x_{R'}}/{\lambda(x_A-x_{R'})},
-    30.5/OUTPUT/{x_{R'}}/{y_{R'}}}{
-      \node[font=\small\bfseries] at (\xx,6.75) {\head};
-      \node[font=\normalsize] at (\xx,6.02) {$\xval$};
-      \node[font=\normalsize] at (\xx,5.35) {$\yval$};
-  }
-  \node[font=\normalsize\bfseries, anchor=east] at (3.5,6.02) {$X$ register};
-  \node[font=\normalsize\bfseries, anchor=east] at (3.5,5.35) {$Y$ register};
-  \foreach \xa/\xb in {6.3/8.8,11.4/13.9,16.5/19.0,21.6/24.1,26.7/29.2}{
-    \draw[flow, black!60] (\xa,5.68) -- (\xb,5.68);
-  }
-
-  % Dialog-GCD callout.
-  \draw[black, line width=0.8pt, rounded corners=1pt]
-    (2.0,1.15) rectangle (32.3,4.15);
-  \node[font=\large\bfseries, anchor=west] at (2.35,3.78)
-    {Shared dialog-GCD machinery};
-  \node[add, text width=42mm] (D1) at (5.6,2.55)
-    {Jump-2 binary-GCD walk\\on $(p,\text{denominator})$};
-  \node[add, text width=42mm] (D2) at (12.9,2.55)
-    {record and compress\\branch/shift transcript};
-  \node[add, text width=42mm] (D3) at (20.2,2.55)
-    {reverse replay on\\the numerator register};
-  \node[add, text width=55mm] (D4) at (28.1,2.55)
-    {division produces $\lambda$; reverse use\\multiplies by $X$ and erases $\lambda$};
-  \draw[flow] (D1.east) -- (D2.west);
-  \draw[flow] (D2.east) -- (D3.west);
-  \draw[flow] (D3.east) -- (D4.west);
-
-  \node[note, text width=31cm, align=center] at (17.15,0.82)
-    {When $u_j=0$, the table selects the identity $\mathcal O$ and the controlled arithmetic leaves $R$ unchanged.};
-  \node[note, text width=31cm, align=center, font=\small\itshape] at (17.15,0.40)
-    {In ECDSA.Fail, $(x_A,y_A)$ are classical input bits; a full windowed-Shor circuit must separately implement and validate the coherent QROM interface.};
-\end{tikzpicture}
-
-\newpage
-
-% ============================================================================
-% Page 6: phase 4, specialized square
+% Page 11: phase 4, specialized square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -758,7 +967,7 @@
 \newpage
 
 % ============================================================================
-% Page 7: phase 5, reverse dialog-GCD multiplication
+% Page 12: phase 5, reverse dialog-GCD multiplication
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -827,7 +1036,7 @@
 \newpage
 
 % ============================================================================
-% Page 8: phase 6, recover affine output
+% Page 13: phase 6, recover affine output
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
