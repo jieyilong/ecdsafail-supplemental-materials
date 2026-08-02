@@ -444,7 +444,7 @@
   \node[lookup, text width=38mm] (UX) at (20.0,15.55)
     {unload classical bits\\$\ket{x_A}_{C_x}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,15.55) -- (UX.west);
-  \node[note, anchor=south west] at (22.7,13.05) {$X=\ket{d_x}$};
+  \node[note, anchor=south west] at (29.0,13.05) {$X=\ket{d_x}$};
 
   % Y lane and its classical addend workspace.
   \node[lab, anchor=east] at (2.2,8.15) {$Y:\ \ket{y_R}$};
@@ -460,7 +460,7 @@
   \node[lookup, text width=38mm] (UY) at (20.0,10.65)
     {unload classical bits\\$\ket{y_A}_{C_y}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,10.65) -- (UY.west);
-  \node[note, anchor=south west] at (22.7,8.15) {$Y=\ket{d_y}$};
+  \node[note, anchor=south west] at (29.0,8.15) {$Y=\ket{d_y}$};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
     {\textbf{Phase 1 optimization stack}\\[0.8mm]
@@ -619,9 +619,11 @@
   \draw[wire] (2.35,8.7) -- (32.2,8.7);
   \draw[wire] (2.35,5.35) -- (32.2,5.35);
 
-  \node[detailviolet, text width=35mm] (SW) at (5.0,7.02)
-    {swap numerator\\into scratch\\[1mm]
-     $Y\leftrightarrow Z$};
+  \node[detailviolet, text width=47mm] (SW) at (5.3,7.02)
+    {prepare the Bezout pair\\[0.8mm]
+     $Z$ is a clean $256$-qubit ancilla\\
+     $(Y,Z):(d_y,0)\longmapsto(0,d_y)$\\
+     $Y$ is cleared to receive $\lambda$};
   \draw[wire] (5.0,8.7) -- (SW.north);
   \draw[wire] (5.0,5.35) -- (SW.south);
 
@@ -633,15 +635,18 @@
     {initialize\\$u\gets p$};
   \draw[wire] (PREG.south) -- (WALK.north);
 
-  \node[detailorange, text width=42mm] (TAPE) at (16.0,11.1)
-    {K5 codec\\pack each reachable\\branch/shift symbol into $\tau$};
+  \node[detailorange, text width=50mm] (TAPE) at (16.0,11.1)
+    {base-$5$ dialog codec\\[0.7mm]
+     $\tau$: quantum transcript register\\
+     storing compressed Jump-2 symbols};
   \draw[flow] (WALK.south east) -- (TAPE.north west);
 
   \node[detailviolet, text width=48mm] (APPLY) at (22.0,7.02)
     {apply inverse-transpose steps\\to the Bezout pair\\[1mm]
      $\ket{0}_Y\ket{d_y}_Z\mapsto
       \ket{d_y/d_x}_Y\ket{0}_Z$};
-  \draw[flow] (TAPE.south east) -- (APPLY.north west);
+  \draw[flow] (WALK.east) -- node[note, above] {live step controls}
+    (20.0,13.5) -- (APPLY.north);
   \draw[wire] (22.0,8.7) -- (APPLY.north);
   \draw[wire] (22.0,5.35) -- (APPLY.south);
 
@@ -653,25 +658,29 @@
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
     {\textbf{Phase 2 optimization stack}\\[0.8mm]
-     {\footnotesize Jump-2 $\bullet$ base-$5$ (K5) codec $\bullet$ streamed replay\\
+     {\footnotesize Jump-2 $\bullet$ base-$5$ dialog codec $\bullet$ streamed replay\\
      shrinking active widths $\bullet$ comparison narrowing\\
      temporary-lane reuse $\bullet$ scheduled carry venting}};
 
+  \node[note, anchor=north east] at (32.0,12.55)
+    {$X=\ket{d_x}$ (restored)};
   \node[note, anchor=south west] at (29.6,8.7) {$Y=\ket{\lambda}$};
-  \node[note, anchor=south west] at (29.6,5.35) {$Z=\ket{0}^{\otimes256}$};
+  \node[note, anchor=south west] at (29.2,5.35)
+    {$Z=\ket{0}^{\otimes256}$ (clean and released)};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,1.05) rectangle (32.3,3.92);
   \node[font=\large\bfseries, anchor=west] at (2.4,3.52)
-    {Dialog relation and cleanup};
+    {Physical-register map and cleanup};
   \node[font=\normalsize] at (17.15,2.78)
-    {$(u,v;X_B,Y_B):(p,d_x;0,d_y)
-      \xrightarrow{\ \text{walk and inverse-transpose replay}\ }
-      (1,0;\lambda,0),\qquad \lambda=d_y d_x^{-1}\pmod p$};
+    {$\ket{p}_u\ket{d_x}_X\ket{0}_Y\ket{d_y}_Z
+      \xrightarrow{\ \text{forward walk, live update, and reverse cleanup}\ }
+      \ket{0}_u\ket{d_x}_X\ket{\lambda}_Y\ket{0}_Z,\qquad
+      \lambda=d_y d_x^{-1}\pmod p$};
   \node[note, text width=29cm, align=center] at (17.15,1.82)
-    {Each Jump-2 step records whether subtraction, swapping, and a second halving occurred.  Only five of the eight nominal three-bit symbols are reachable, which permits the compressed dialog representation.};
+    {During the forward walk, physical register $X$ serves as the Euclidean operand $v$ and is temporarily modified; the reverse walk restores $X=d_x$.  Physical registers $(Y,Z)$ are the coefficient pair and evolve from $(0,d_y)$ to $(\lambda,0)$.  The displayed endpoint is the ideal accepted-path relation for the fixed $261$-step truncated schedule validated on the benchmark support.};
   \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.70)
-    {Source correspondence: \texttt{mod\_mul\_inverse\_in\_place(..., Direction::Inverse)}, \texttt{forward\_gcd\_jump}, and \texttt{reverse\_gcd\_jump}.};
+    {Source correspondence: \texttt{mod\_mul\_inverse\_in\_place(..., Direction::Inverse)}, \texttt{forward\_gcd\_jump}, \texttt{reverse\_gcd\_jump}, and \texttt{DialogCodec}; related source paths use the ``K5 codec'' jargon for the five-symbol dialog-codec family.};
 \end{tikzpicture}
 
 \newpage
@@ -690,7 +699,7 @@
   \node[detailviolet, text width=35mm, minimum height=23mm] (S0) at (3.3,13.4)
     {active state\\[1mm]
      $u$ odd, $v\geq0$\\
-     Bezout pair $(X_B,Y_B)$};
+     coefficient pair $(Y,Z)$};
   \node[detail, text width=38mm, minimum height=23mm] (S1) at (8.7,13.4)
     {first halving\\[1mm]
      $v\leftarrow v/2$\\
@@ -736,11 +745,11 @@
   \node[font=\large\bfseries, anchor=west] at (14.55,10.18)
     {Why the recorded symbol is sufficient};
   \node[note, text width=17.6cm, align=left, anchor=west] at (14.55,9.13)
-    {The walk applies a data-dependent linear update $M$ to $(u,v)$.  The paired arithmetic applies the inverse transpose $M^{-T}$ to $(X_B,Y_B)$, preserving the division relation.  The bit $s_2$ selects whether this paired update contains one or two powers of two, while $b$ and $s$ select subtraction and operand order.};
+    {The walk applies a data-dependent linear update $M$ to $(u,v)$, where $v$ is physically the coordinate register $X$.  The paired arithmetic applies $M^{-T}$ directly to physical registers $(Y,Z)$, preserving the division relation.  The bit $s_2$ selects whether this update contains one or two powers of two, while $b$ and $s$ select subtraction and operand order.};
   \node[font=\normalsize] at (23.55,7.48)
     {$\text{walk: }(u,v)\xrightarrow{\ M\ }(u',v')
       \qquad\Longleftrightarrow\qquad
-      \text{paired update: }(X_B,Y_B)\xrightarrow{\ M^{-T}\ }(X_B',Y_B')$};
+      \text{physical pair: }(Y,Z)\xrightarrow{\ M^{-T}\ }(Y',Z')$};
 
   \node[note, text width=30cm, align=center] at (17.15,4.65)
     {Compared with a one-step binary-GCD schedule, Jump-2 packages the mandatory halving and a possible second halving into one recorded iteration.  Submission \texttt{8e9c9a2} executes 261 such iterations and replays their symbols in reverse order to recover the quotient while restoring the Euclidean workspace.};
@@ -751,13 +760,13 @@
 \newpage
 
 % ============================================================================
-% Page 8: K5 codec and streamed replay used inside phase 2
+% Page 8: base-5 codec and streamed replay used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: K5 codec and streamed dialog replay};
+    {Phase 2 detail: base-$5$ codec and streamed dialog replay};
   \node[font=\large] at (17.15,17.28)
     {Compress the five-way Jump-2 control alphabet, then decode only the symbols needed by the active replay step};
 
@@ -796,23 +805,29 @@
   \node[note, text width=8.8cm, align=center] at (28.25,12.20)
     {qubits, versus $261\cdot3=783$ for naive raw storage.  Boundary symbols use specialized two- and five-bit layouts.};
 
-  \node[detailviolet, text width=42mm, minimum height=18mm] (FWD) at (3.6,7.5)
+  \node[detailviolet, text width=39mm, minimum height=18mm] (FWD) at (3.3,7.5)
     {forward GCD walk\\produces $\sigma_0,\sigma_1,\ldots$};
-  \node[detailorange, text width=42mm, minimum height=18mm] (ENC) at (9.2,7.5)
+  \coordinate (BRANCH) at (6.1,7.5);
+  \node[detailviolet, text width=43mm, minimum height=18mm] (LIVE) at (9.5,9.0)
+    {use live symbol immediately\\for $M^{-T}$ Bezout update};
+  \node[detailgreen, text width=34mm, minimum height=18mm] (LAMBDA) at (15.0,9.0)
+    {accumulate slope\\$Y\longrightarrow\lambda$};
+  \node[detailorange, text width=40mm, minimum height=18mm] (ENC) at (9.5,6.0)
     {encode each full group\\and release two wires};
-  \node[detailgreen, text width=42mm, minimum height=18mm] (TAU) at (14.8,7.5)
-    {compressed dialog tape\\$\tau$};
-  \node[detailorange, text width=42mm, minimum height=18mm] (DEC) at (20.4,7.5)
+  \node[detailgreen, text width=40mm, minimum height=18mm] (TAU) at (15.0,6.0)
+    {$\tau$: quantum transcript register\\
+     compressed GCD decisions};
+  \node[detailorange, text width=40mm, minimum height=18mm] (DEC) at (20.5,6.0)
     {decode one group\\only when replay reaches it};
-  \node[detailviolet, text width=42mm, minimum height=18mm] (REP) at (26.0,7.5)
-    {apply inverse-transpose\\update to the Bezout pair};
-  \node[detailgreen, text width=34mm, minimum height=18mm] (CLR) at (31.1,7.5)
-    {uncompute group\\$\tau\longrightarrow0$};
-  \draw[flow] (FWD.east) -- (ENC.west);
+  \node[detailgreen, text width=54mm, minimum height=18mm] (REVPLAY) at (27.3,6.0)
+    {reverse the GCD walk\\consume $\tau$; restore $X=d_x$;\\clear Euclidean workspace};
+  \draw[flow] (FWD.east) -- (BRANCH);
+  \draw[flow] (BRANCH) |- node[note, above, near end] {live controls} (LIVE.west);
+  \draw[flow] (LIVE.east) -- (LAMBDA.west);
+  \draw[flow] (BRANCH) |- node[note, below, near end] {same controls} (ENC.west);
   \draw[flow] (ENC.east) -- (TAU.west);
   \draw[flow] (TAU.east) -- (DEC.west);
-  \draw[flow] (DEC.east) -- (REP.west);
-  \draw[flow] (REP.east) -- (CLR.west);
+  \draw[flow] (DEC.east) -- (REVPLAY.west);
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (1.1,1.3) rectangle (33.2,4.85);
@@ -827,7 +842,9 @@
   \node[font=\normalsize] at (22.2,2.68) {remaining $u,v$};
   \node[font=\normalsize] at (28.35,2.68) {compressed tape $\tau$};
   \node[note, text width=29cm, align=center] at (17.15,1.72)
-    {As the active Euclidean registers narrow, the tape grows into the released space.  Streamed decoding prevents the raw transcript and the full arithmetic state from being live simultaneously.};
+    {As the active Euclidean registers narrow, $\tau$ grows into the released space. Streamed decoding consumes its symbols during reverse replay, restores the Euclidean workspace, and returns the transcript ancillas to $\ket{0}$.};
+  \node[note, text width=30cm, align=center, font=\small\itshape] at (17.15,0.62)
+    {Source terminology: this slide describes \texttt{DialogCodec::Pair} and \texttt{DialogCodec::Triple}; related source paths and development notes use the ``K5 codec'' jargon for the corresponding five-symbol encoding idea.};
 \end{tikzpicture}
 
 \newpage
@@ -931,6 +948,8 @@
   \draw[wire] (2.35,6.95) -- (32.2,6.95);
   \node[registerbox, text width=45mm] at (20.0,6.95)
     {$Y$ bypasses this phase unchanged};
+  \node[note, anchor=south west] at (29.0,6.95)
+    {$Y=\ket{\lambda}$ (unchanged)};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
     {\textbf{Phase 3 optimization stack}\\[0.8mm]
@@ -968,6 +987,8 @@
     {logical split\\[1mm]
      $\lambda=L+2^{128}H$\\
      $L,H\in\{0,1\}^{128}$};
+  \node[note, anchor=south west] at (29.0,15.0)
+    {$Y=\ket{\lambda}$ (unchanged)};
 
   \node[detail, text width=43mm] (PC) at (10.2,12.1)
     {form $S=L+H$;\\build $C=S^2$};
@@ -1020,43 +1041,46 @@
 \newpage
 
 % ============================================================================
-% Page 12: phase 4 detail, streamed pseudo-Mersenne square
+% Page 12: phase 4 detail, symmetry-aware streamed Karatsuba square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 4 detail: streamed pseudo-Mersenne squaring};
+    {Phase 4 detail: symmetry-aware streamed Karatsuba squaring};
   \node[font=\large] at (17.15,17.28)
-    {Three half-size symmetric squares implement $X\gets X-\lambda^2\pmod p$ without retaining a generic $512$-bit product.};
+    {A standard one-level Karatsuba identity is specialized to squaring, reversible streaming, and the secp256k1 prime.};
 
   % Algebra panel.
   \draw[black!55, line width=0.8pt, rounded corners=1pt]
     (1.25,6.15) rectangle (16.90,16.50);
   \node[font=\large\bfseries, anchor=west] at (1.70,15.98)
-    {Three-square decomposition};
+    {Standard Karatsuba square identity};
   \node[note, text width=14.4cm, align=center] at (9.08,14.92)
-    {To avoid confusion with the selected elliptic-curve addend $A$, denote the temporary products by $U$, $V$, and $W$:};
+    {Let $\beta=2^{128}$ and write $\lambda=L+\beta H$.  To avoid confusion with the selected elliptic-curve addend $A$, denote the three temporary squares by $U$, $V$, and $W$:};
   \node[font=\large] at (9.08,13.88)
-    {$\lambda=L+2^{128}H,\qquad U=L^2,\qquad V=H^2,\qquad W=(L+H)^2.$};
+    {$U=L^2,\qquad V=H^2,\qquad W=(L+H)^2.$};
   \node[font=\large] at (9.08,12.65)
-    {$W-U-V=2LH$};
+    {$W-U-V=2LH,\qquad
+      \lambda^2=U+\beta(W-U-V)+\beta^2V.$};
   \node[font=\large] at (9.08,11.42)
-    {$\lambda^2=U+2^{128}(W-U-V)+2^{256}V.$};
-  \node[font=\large] at (9.08,10.17)
-    {$p=2^{256}-F\ \Longrightarrow\ 2^{256}\equiv F\pmod p,$};
-  \node[font=\large] at (9.08,9.08)
-    {$\lambda^2\equiv U+2^{128}(W-U-V)+FV\pmod p.$};
+    {$p=2^{256}-F,\quad F=2^{32}+977
+      \quad\Longrightarrow\quad \beta^2=2^{256}\equiv F\pmod p.$};
+  \node[font=\large] at (9.08,10.08)
+    {$\therefore\quad
+      \lambda^2\equiv U+\beta(W-U-V)+FV\pmod p.$};
+  \node[note, text width=14.2cm, align=center] at (9.08,9.12)
+    {Karatsuba supplies the algebra; the circuit-specific gains come from symmetric partial products, immediate accumulation, and pseudo-Mersenne folding.};
 
   \node[detailorange, text width=40mm, minimum height=17mm] at (3.85,7.28)
     {$W$ contribution\\[1mm]
-     $X\gets X-2^{128}W$};
+     $X\gets X-\beta W$};
   \node[detailorange, text width=43mm, minimum height=17mm] at (9.05,7.28)
     {$U$ contributions\\[1mm]
-     $X\gets X-U+2^{128}U$};
+     $X\gets X-U+\beta U$};
   \node[detailorange, text width=45mm, minimum height=17mm] at (14.35,7.28)
     {$V$ contributions\\[1mm]
-     $X\gets X+2^{128}V-FV$};
+     $X\gets X+\beta V-FV$};
 
   % Reversible schedule panel.
   \draw[black!55, line width=0.8pt, rounded corners=1pt]
@@ -1065,13 +1089,13 @@
     {Reversible build--apply--unbuild schedule};
 
   \node[detail, text width=137mm, minimum height=9mm] at (25.20,14.72)
-    {\textbf{1. Split and prepare.} View $Y=\lambda$ as the slices $L$ and $H$; reversibly build the $129$-bit sum $S=L+H$.};
+    {\textbf{1. Split and prepare.} View $Y=\lambda$ as the $128$-bit slices $L$ and $H$; reversibly build the $129$-bit sum $S=L+H$.};
   \node[detailviolet, text width=137mm, minimum height=9mm] at (25.20,13.20)
-    {\textbf{2. Sum square.} Build $W=S^2$, apply $-2^{128}W$ to $X$, and reverse the squarer to return the $W$ register to zero.};
+    {\textbf{2. Sum square.} Build $W=S^2$, apply $-\beta W$ directly to $X$, and reverse the squarer to return its product register to zero.};
   \node[detail, text width=137mm, minimum height=9mm] at (25.20,11.68)
-    {\textbf{3. Low-half square.} Build $U=L^2$, apply $-U+2^{128}U$ to $X$, and unbuild $U$.};
+    {\textbf{3. Low-half square.} Build $U=L^2$, apply $-U+\beta U$ directly to $X$, and unbuild $U$.};
   \node[detailviolet, text width=137mm, minimum height=9mm] at (25.20,10.16)
-    {\textbf{4. High-half square.} Build $V=H^2$, apply $+2^{128}V-FV$ to $X$, and unbuild $V$.};
+    {\textbf{4. High-half square.} Build $V=H^2$, apply $+\beta V-FV$ directly to $X$, and unbuild $V$.};
   \node[detail, text width=137mm, minimum height=9mm] at (25.20,8.64)
     {\textbf{5. Clean the preparation.} Reverse the addition that formed $S=L+H$; all square work registers return to $\ket{0}$.};
   \node[detailgreen, text width=137mm, minimum height=10mm] at (25.20,7.08)
@@ -1082,22 +1106,22 @@
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (1.25,1.05) rectangle (33.05,5.55);
   \node[font=\large\bfseries, anchor=west] at (1.70,5.13)
-    {Why this construction is specialized};
+    {Circuit-level specializations beyond standard Karatsuba};
   \node[detail, text width=63mm, minimum height=24mm] at (5.10,3.15)
     {\textbf{Symmetric squaring}\\[1mm]
-     Diagonal terms are copied directly; only $n(n-1)/2$ unordered cross terms are formed.};
+     Diagonal bits are copied directly.  The three squares form $24{,}512$ unordered cross products, $24.9\%$ fewer than a direct $256$-bit symmetric square.};
   \node[detailgreen, text width=63mm, minimum height=24mm] at (13.15,3.15)
-    {\textbf{Streamed products}\\[1mm]
-     Only one of $U$, $V$, or $W$ is live at a time; each is accumulated into $X$ and immediately uncomputed.};
+    {\textbf{Direct streamed accumulation}\\[1mm]
+     Only one of $U$, $V$, or $W$ is live at a time.  Each signed contribution is applied to $X$ and immediately uncomputed, avoiding a persistent $512$-bit square.};
   \node[detailorange, text width=63mm, minimum height=24mm] at (21.20,3.15)
     {\textbf{Pseudo-Mersenne fold}\\[1mm]
-     Terms crossing bit $255$ are folded back with $2^{256}\equiv F\pmod p$ instead of using generic reduction.};
+     The high limb $2^{256}V$ becomes $FV$ modulo $p$, replacing generic full-width modular reduction by a fixed-constant fold.};
   \node[detailviolet, text width=63mm, minimum height=24mm] at (29.25,3.15)
-    {\textbf{Sparse constant}\\[1mm]
-     $F=2^{32}+2^{10}-2^6+2^4+1$, so $FV$ uses five shifted additions or subtractions.};
+    {\textbf{Sparse signed constant}\\[1mm]
+     $F=2^{32}+2^{10}-2^6+2^4+1$, so $FV$ is assembled from five shifted additions or subtractions rather than a generic multiplication.};
 
   \node[note, text width=31cm, align=center, font=\small\itshape] at (17.15,0.55)
-    {Source correspondence: \texttt{mod\_square\_sub\_pm\_secp256k1\_symmetric}; the source names $U$, $V$, and $W$ as \texttt{a\_prod}, \texttt{b\_prod}, and \texttt{c\_prod}.};
+    {The Karatsuba identity is exact; any benchmark-calibrated finite-width correction is a separate optimization.  Source correspondence: \texttt{mod\_square\_sub\_pm\_secp256k1\_symmetric}.};
 \end{tikzpicture}
 
 \newpage
@@ -1135,8 +1159,10 @@
     {initialize\\$u\gets p$};
   \draw[wire] (PREG2.south) -- (WALK2.north);
 
-  \node[detailorange, text width=42mm] (TAPE2) at (16.0,11.1)
-    {compressed dialog $\tau$\\encodes the reversible\\Euclidean path for $X$};
+  \node[detailorange, text width=50mm] (TAPE2) at (16.0,11.1)
+    {$\tau$: quantum transcript register\\[0.7mm]
+     stores the compressed symbols\\
+     needed to reverse the GCD path for $X$};
   \draw[flow] (WALK2.south east) -- (TAPE2.north west);
 
   \node[detailviolet, text width=50mm] (REPLAY2) at (22.0,7.02)
@@ -1159,8 +1185,11 @@
      in-place forward multiply $\bullet$ streamed reverse replay\\
      shrinking widths $\bullet$ per-call carry schedules}};
 
+  \node[note, anchor=north east] at (32.0,12.55)
+    {$X=\ket{x_A-x_{R'}}$ (restored)};
   \node[note, anchor=south west] at (29.6,8.7) {$Y=\ket{\lambda X}$};
-  \node[note, anchor=south west] at (29.6,5.35) {$Z=\ket{0}^{\otimes256}$};
+  \node[note, anchor=south west] at (29.1,5.35)
+    {$Z=\ket{0}^{\otimes256}$ (clean and released)};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,1.05) rectangle (32.3,3.92);
@@ -1203,7 +1232,7 @@
   \node[lookup, text width=38mm] (UYF) at (21.0,15.3)
     {unload and free\\$\ket{y_A}_{C_y}$};
   \draw[flow] (LYF.east) -- (UYF.west);
-  \node[note, anchor=south west] at (25.5,13.0) {$Y=\ket{y_{R'}}$};
+  \node[note, anchor=south west] at (29.0,13.0) {$Y=\ket{y_{R'}}$};
 
   % X reverse-subtraction lane.
   \node[lab, anchor=east] at (2.2,7.7) {$X:$};
