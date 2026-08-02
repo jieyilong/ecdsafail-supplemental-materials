@@ -339,7 +339,7 @@
      $\phantom{X}=x_A-x_{R'}$\\
      $Y=\lambda$};
   \node[phaseviolet] (S5) at (25.0,10.05)
-    {\textbf{5. Reverse dialog-GCD}\\[-0.5mm]
+    {\textbf{5. Forward multiplication}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 5}\\[1.2mm]
      $Y\gets\lambda X$\\
      $\phantom{Y}=\lambda(x_A-x_{R'})$\\
@@ -404,7 +404,7 @@
     {\textbf{Specialized square}\\
      \texttt{tlm\_square}};
   \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (25.0,2.55)
-    {\textbf{Reverse dialog-GCD}\\
+    {\textbf{Forward multiplication}\\
      \texttt{tlm\_forward\_multiply}};
   \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (29.85,2.55)
     {\textbf{Recover output}\\
@@ -441,7 +441,7 @@
      $\ket{x_R}_X\ket{x_A}_{C_x}$\\
      $\longmapsto\ket{x_R-x_A}_X\ket{x_A}_{C_x}$};
   \draw[wire] (12.0,15.55) -- (SUBX.north);
-  \node[detailviolet, text width=38mm, minimum height=8mm] (UX) at (20.0,15.55)
+  \node[lookup, text width=38mm] (UX) at (20.0,15.55)
     {unload classical bits\\$\ket{x_A}_{C_x}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,15.55) -- (UX.west);
   \node[note, anchor=south west] at (22.7,13.05) {$X=\ket{d_x}$};
@@ -457,10 +457,16 @@
      $\ket{y_R}_Y\ket{y_A}_{C_y}$\\
      $\longmapsto\ket{y_R-y_A}_Y\ket{y_A}_{C_y}$};
   \draw[wire] (12.0,10.65) -- (SUBY.north);
-  \node[detailviolet, text width=38mm, minimum height=8mm] (UY) at (20.0,10.65)
+  \node[lookup, text width=38mm] (UY) at (20.0,10.65)
     {unload classical bits\\$\ket{y_A}_{C_y}\mapsto\ket{0}^{\otimes256}$};
   \draw[flow] (18.0,10.65) -- (UY.west);
   \node[note, anchor=south west] at (22.7,8.15) {$Y=\ket{d_y}$};
+
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
+    {\textbf{Phase 1 optimization stack}\\[0.8mm]
+     {\footnotesize off-peak classical addend $\bullet$ serialized $256$-qubit workspace\\
+     $53$-bit pseudo-Mersenne fold $\bullet$ $19$-bit final comparison\\
+     measurement-based carry uncomputation}};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,2.0) rectangle (32.3,5.35);
@@ -500,7 +506,7 @@
     {load fixed bits\\$C\gets x_A$};
   \node[detail, text width=39mm, minimum height=13mm] (LX3) at (14.1,13.95)
     {$X\gets X-C\pmod p$\\via \texttt{mod\_sub\_vented}};
-  \node[detailviolet, text width=35mm, minimum height=8mm] (LX4) at (19.0,13.95)
+  \node[lookup, text width=35mm] (LX4) at (19.0,13.95)
     {unload $x_A$\\and free $C$};
   \draw[flow] (2.95,13.95) -- (LX1.west);
   \draw[flow] (LX1.east) -- (LX2.west);
@@ -517,7 +523,7 @@
     {load fixed bits\\$C\gets y_A$};
   \node[detail, text width=39mm, minimum height=13mm] (LY3) at (14.1,11.55)
     {$Y\gets Y-C\pmod p$\\via \texttt{mod\_sub\_vented}};
-  \node[detailviolet, text width=35mm, minimum height=8mm] (LY4) at (19.0,11.55)
+  \node[lookup, text width=35mm] (LY4) at (19.0,11.55)
     {unload $y_A$\\and free $C$};
   \draw[flow] (2.95,11.55) -- (LY1.west);
   \draw[flow] (LY1.east) -- (LY2.west);
@@ -530,35 +536,49 @@
   % Three implementation mechanisms.
   \node[detailorange, text width=82mm, minimum height=59mm, font=\small] (C1) at (6.7,6.55)
     {{\normalsize\bfseries Classical-addend specialization}\\[1.2mm]
-     For either classical coordinate $c\in\{x_A,y_A\}$, each known bit loads a clean temporary qubit by
+     For a classical input bit $c_i$, $X^{c_i}$ tells the controller to apply $X$ to the target $C_i$ iff $c_i=1$:
      \[
        \ket{0}_{C_i}\xrightarrow{\,X^{c_i}\,}\ket{c_i}_{C_i}.
      \]
-     The loaded register supplies the operand for the target reversible map
+     Thus $X^0=I$ and $X^1=X$; $c_i$ is not a quantum input wire.  The loaded coordinate $c\in\{x_A,y_A\}$ supplies the operand for
      \[
        \ket{r}\ket{c}_C\longmapsto
        \ket{r-c\bmod p}\ket{c}_C.
      \]
-     Applying the same $X^{c_i}$ gates again returns $C$ to $\ket{0}^{\otimes256}$. The $x_A$ and $y_A$ calls are sequential, so only one coordinate copy is live.};
+     Repeating the same operations unloads $C$ because $(X^{c_i})^2=I$. The $x_A$ and $y_A$ calls are sequential, so only one coordinate copy is live.};
 
-  \node[detail, text width=82mm, minimum height=59mm, font=\small] (C2) at (17.15,6.55)
+  \node[detail, text width=90mm, minimum height=59mm, font=\small] (C2) at (17.15,6.55)
     {{\normalsize\bfseries Pseudo-Mersenne modular correction}\\[1.2mm]
-     Let $b=[y<x]$ be the subtraction borrow and
+     For canonical field inputs $0\le x,y<p$, let $b=[y<x]$ be the subtraction borrow. The $256$-bit subtractor returns
+     {\normalsize
      \[
-       r_0=(y-x)\bmod 2^{256}.
-     \]
-     Since $p=2^{256}-F$ with $F=2^{32}+977$, the desired residue is
+       r_0=(y-x)\bmod 2^{256}
+       =\begin{cases}
+          y-x, & y\ge x,\\
+          2^{256}+y-x, & y<x.
+        \end{cases}
+     \]}
+     For $F=2^{32}+977$, the pseudo-Mersenne identity gives
+     {\normalsize
      \[
-       r=r_0-bF\pmod{2^{256}}.
-     \]
-     The implementation applies this correction to
-     $\operatorname{low}_{53}(r_0)$, where $53=\operatorname{bitlen}(F)+20$.
-     Cleanup of $b$ then compares only
-     $\operatorname{MSB}_{19}(y)$ and $\operatorname{MSB}_{19}(x)$; these truncations are validated on the benchmark support rather than proved for all inputs.};
+       p=2^{256}-F\equiv0\pmod p
+       \quad\Longrightarrow\quad
+       2^{256}\equiv F\pmod p.
+     \]}
+     {\normalsize
+     \[
+       r=(y-x)\bmod p
+       =\begin{cases}
+          r_0, & y\ge x,\\
+          r_0-F=p+y-x, & y<x,
+        \end{cases}
+     \]}
+     Thus $r=r_0-bF\pmod{2^{256}}$.
+     The source corrects only $\operatorname{low}_{53}(r_0)$ and reconstructs $b$ from $\operatorname{MSB}_{19}(y)$ and $\operatorname{MSB}_{19}(x)$; both truncations are benchmark-validated rather than all-input proofs.};
 
   \node[detailviolet, text width=82mm, minimum height=59mm, font=\small] (C3) at (27.6,6.55)
-    {{\normalsize\bfseries Vented carry cleanup}\\[-0.3mm]
-     {\itshape Gidney-style measurement-based uncomputation}\\[1.2mm]
+    {{\normalsize\bfseries Measurement-based carry uncomputation}\\[-0.3mm]
+     {\itshape ``carry venting'' in the implementation}\\[1.2mm]
      A forward Toffoli stores $c=a\wedge b$ in a clean ancilla:
      {\normalsize
      \[
@@ -573,10 +593,10 @@
      \]}
      The classically conditioned correction $\mathrm{CZ}^{m}_{a,b}$ removes this phase exactly. This is the temporary-logical-AND cleanup: the ancilla is discarded and the reverse carry-uncompute Toffoli is omitted.};
 
-  \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,2.0)
+  \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,1.55)
     {\textbf{Interpretation.} Phase 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
 
-  \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.70)
+  \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.38)
     {Source correspondence: the sequential \texttt{coord\_addsub} calls and \texttt{mod\_sub\_vented} implementation in submission \texttt{8e9c9a2}.};
 \end{tikzpicture}
 
@@ -632,11 +652,11 @@
      restore $X=d_x$; clear $(u,v)$};
   \draw[flow] (TAPE.north east) -- (REV.south west);
 
-  \node[detail, text width=82mm, minimum height=14mm] at (23.7,15.72)
-    {\textbf{Phase 2 optimization stack}\\[-1mm]
-     {\small Jump-2 $\bullet$ K5 support-set codec $\bullet$ streamed replay\\
-     shrinking active widths $\bullet$ truncated comparisons\\
-     temporary qubit reuse $\bullet$ measurement-assisted cleanup}};
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
+    {\textbf{Phase 2 optimization stack}\\[0.8mm]
+     {\footnotesize Jump-2 $\bullet$ base-$5$ (K5) codec $\bullet$ streamed replay\\
+     shrinking active widths $\bullet$ comparison narrowing\\
+     temporary-lane reuse $\bullet$ scheduled carry venting}};
 
   \node[note, anchor=south west] at (29.6,8.7) {$Y=\ket{\lambda}$};
   \node[note, anchor=south west] at (29.6,5.35) {$Z=\ket{0}^{\otimes256}$};
@@ -913,6 +933,11 @@
   \node[registerbox, text width=45mm] at (20.0,6.95)
     {$Y$ bypasses this phase unchanged};
 
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
+    {\textbf{Phase 3 optimization stack}\\[0.8mm]
+     {\footnotesize classical $3x_A\bmod p$ $\bullet$ transient $256$-qubit materialization\\
+     $53$-bit fold $\bullet$ $19$-bit comparison $\bullet$ immediate unload}};
+
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,1.45) rectangle (32.3,4.72);
   \node[font=\large\bfseries, anchor=west] at (2.4,4.30)
@@ -972,6 +997,11 @@
   \draw[flow] (PA.south) -- (AA.north);
   \draw[flow] (PB.south) -- (AB.north);
   \node[note, anchor=south west] at (29.0,8.25) {$X=\ket{x_A-x_{R'}}$};
+
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
+    {\textbf{Phase 4 optimization stack}\\[0.8mm]
+     {\footnotesize three-square Karatsuba $\bullet$ symmetric squaring $\bullet$ streamed products\\
+     pseudo-Mersenne NAF fold $\bullet$ from-zero adds $\bullet$ adaptive carry venting}};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,1.2) rectangle (32.3,5.45);
@@ -1074,13 +1104,13 @@
 \newpage
 
 % ============================================================================
-% Page 13: phase 5, reverse dialog-GCD multiplication
+% Page 13: phase 5, forward multiplication via dialog-GCD replay
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 5: multiply by replaying the dialog-GCD circuit in reverse};
+    {Phase 5: forward multiplication via dialog-GCD replay};
   \node[font=\large] at (17.15,17.28)
     {$Y=\lambda\longmapsto\lambda X=\lambda(x_A-x_{R'})\pmod p$ while preserving $X$};
 
@@ -1123,6 +1153,13 @@
      consume $\tau$; restore $X$;\\
      clear Euclidean workspace};
   \draw[flow] (TAPE2.north east) -- (CLEAN2.south west);
+
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
+    {\textbf{Phase 5 optimization stack}\\[0.8mm]
+     {\footnotesize shared Jump-2 engine $\bullet$ fresh base-$5$ dialog\\
+     in-place forward multiply $\bullet$ streamed reverse replay\\
+     shrinking widths $\bullet$ per-call carry schedules}};
+
   \node[note, anchor=south west] at (29.6,8.7) {$Y=\ket{\lambda X}$};
   \node[note, anchor=south west] at (29.6,5.35) {$Z=\ket{0}^{\otimes256}$};
 
@@ -1187,6 +1224,11 @@
      $X\gets x_A-X\pmod p$};
   \draw[wire] (PLUS1.south) -- (6.0,9.0) -- (19.0,9.0) -- (RADD.north);
   \node[note, anchor=south west] at (29.1,7.7) {$X=\ket{x_{R'}}$};
+
+  \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
+    {\textbf{Phase 6 optimization stack}\\[0.8mm]
+     {\footnotesize transient classical coordinates $\bullet$ fused complement-plus-add subtraction\\
+     measurement-based carry cleanup $\bullet$ $53$-bit fold $\bullet$ $19$-bit comparison}};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,1.15) rectangle (32.3,4.68);
