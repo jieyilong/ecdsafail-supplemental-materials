@@ -549,7 +549,7 @@
 
   \node[detail, text width=90mm, minimum height=59mm, font=\small] (C2) at (17.15,6.55)
     {{\normalsize\bfseries Pseudo-Mersenne modular correction}\\[1.2mm]
-     For canonical field inputs $0\le x,y<p$, let $b=[y<x]$ be the subtraction borrow. The $256$-bit subtractor returns
+     For $0\le x,y<p$, computing $r_0$ generates internal borrows $b_1,\ldots,b_{255}$ and the final borrow $b=b_{256}=[y<x]$:
      {\normalsize
      \[
        r_0=(y-x)\bmod 2^{256}
@@ -573,25 +573,24 @@
           r_0-F=p+y-x, & y<x,
         \end{cases}
      \]}
-     Thus $r=r_0-bF\pmod{2^{256}}$.
-     The source corrects only $\operatorname{low}_{53}(r_0)$ and reconstructs $b$ from $\operatorname{MSB}_{19}(y)$ and $\operatorname{MSB}_{19}(x)$; both truncations are benchmark-validated rather than all-input proofs.};
+     Thus $r=r_0-bF\pmod{2^{256}}$. The source corrects $\operatorname{low}_{53}(r_0)$ and measurement-uncomputes $b$ using a $19$-MSB phase predicate. Equal top windows can depend on lower bits; these truncations are benchmark-validated rather than all-input proofs.};
 
   \node[detailviolet, text width=82mm, minimum height=59mm, font=\small] (C3) at (27.6,6.55)
     {{\normalsize\bfseries Measurement-based carry uncomputation}\\[-0.3mm]
      {\itshape ``carry venting'' in the implementation}\\[1.2mm]
-     A forward Toffoli stores $c=a\wedge b$ in a clean ancilla:
+     Selected internal borrows $b_i$, rather than the final $b=b_{256}$, are ``vented.'' A forward Toffoli stores an internal carry $c=q_1\wedge q_2$ in a clean ancilla:
      {\normalsize
      \[
-       \sum_{a,b}\alpha_{ab}\ket{a,b}\ket{0}
+       \sum_{q_1,q_2}\alpha_{q_1q_2}\ket{q_1,q_2}\ket{0}
        \longmapsto
-       \sum_{a,b}\alpha_{ab}\ket{a,b}\ket{ab}.
+       \sum_{q_1,q_2}\alpha_{q_1q_2}\ket{q_1,q_2}\ket{q_1q_2}.
      \]}
      Measuring the ancilla in the $X$ basis with result $m\in\{0,1\}$ leaves
      {\normalsize
      \[
-       \sum_{a,b}\alpha_{ab}(-1)^{mab}\ket{a,b}.
+       \sum_{q_1,q_2}\alpha_{q_1q_2}(-1)^{m q_1q_2}\ket{q_1,q_2}.
      \]}
-     The classically conditioned correction $\mathrm{CZ}^{m}_{a,b}$ removes this phase exactly. This is the temporary-logical-AND cleanup: the ancilla is discarded and the reverse carry-uncompute Toffoli is omitted.};
+     The correction $\mathrm{CZ}^{m}_{q_1,q_2}$ removes the phase exactly, omitting the reverse Toffoli. The final $b$ remains live through $-bF$ and is cleaned separately.};
 
   \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,1.55)
     {\textbf{Interpretation.} Phase 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
