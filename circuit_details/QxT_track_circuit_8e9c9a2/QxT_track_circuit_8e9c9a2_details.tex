@@ -31,12 +31,12 @@
   add/.style={draw=black, line width=0.9pt, fill=addviolet,
               minimum height=9mm, rounded corners=1pt,
               inner sep=4pt, align=center, font=\normalsize},
-  phase/.style={draw=black, line width=0.9pt, fill=gateblue,
+  stage/.style={draw=black, line width=0.9pt, fill=gateblue,
                 minimum height=35mm, text width=45mm,
                 rounded corners=1pt, inner sep=5pt,
                 align=center, font=\small},
-  phaseviolet/.style={phase, fill=addviolet},
-  phaseorange/.style={phase, fill=lookorange},
+  stageviolet/.style={stage, fill=addviolet},
+  stageorange/.style={stage, fill=lookorange},
   lab/.style={font=\large},
   smalllab/.style={font=\normalsize},
   note/.style={font=\small, text=black!75},
@@ -410,39 +410,39 @@
   \node[font=\small] at (2.68,9.13) {$256$};
   \node[note] at (4.8,12.0) {quantum accumulator $R=(x_R,y_R)$};
 
-  % Six source-level phases.
-  \node[phase] (S1) at (4.4,10.05)
+  % Six source-level stages.
+  \node[stage] (S1) at (4.4,10.05)
     {\textbf{1. Coordinate differences}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 1}\\[1.2mm]
      $X\gets x_R-x_A=d_x$\\
      $Y\gets y_R-y_A=d_y$\\[1mm]
      consume $A$, then unlookup};
-  \node[phaseviolet] (S2) at (9.55,10.05)
+  \node[stageviolet] (S2) at (9.55,10.05)
     {\textbf{2. Dialog-GCD division}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 2}\\[1.2mm]
      $Y\gets d_y/d_x=\lambda$\\
      $X=d_x$\\[1mm]
      clean GCD workspace};
-  \node[phase] (S3) at (14.7,10.05)
+  \node[stage] (S3) at (14.7,10.05)
     {\textbf{3. Prepare $X$ workspace}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 3}\\[1.2mm]
      $X\gets d_x+3x_A$\\
      $\phantom{X}=x_R+2x_A$\\
      $Y=\lambda$, then unlookup $3x_A$};
-  \node[phaseorange] (S4) at (19.85,10.05)
+  \node[stageorange] (S4) at (19.85,10.05)
     {\textbf{4. Specialized square}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 4}\\[1.2mm]
      $X\gets X-\lambda^2$\\
      $\phantom{X}=x_A-x_{R'}$\\
      $Y=\lambda$};
-  \node[phaseviolet] (S5) at (25.0,10.05)
+  \node[stageviolet] (S5) at (25.0,10.05)
     {\textbf{5. Forward multiplication}\\[-0.5mm]
      \textit{\scriptsize Algorithm line 5}\\[1.2mm]
      $Y\gets\lambda X$\\
      $\phantom{Y}=\lambda(x_A-x_{R'})$\\
      $X=x_A-x_{R'}$\\
      erase $\lambda$ and transcript};
-  \node[phase] (S6) at (30.15,10.05)
+  \node[stage] (S6) at (30.15,10.05)
     {\textbf{6. Recover output}\\[-0.5mm]
      \textit{\scriptsize Algorithm lines 6--7}\\[1.2mm]
      $Y\gets Y-y_A=y_{R'}$\\
@@ -486,7 +486,7 @@
   \draw[black, line width=0.8pt, rounded corners=1pt]
     (2.0,1.15) rectangle (32.3,4.15);
   \node[font=\large\bfseries, anchor=west] at (2.35,3.78)
-    {Source phases in submission \texttt{8e9c9a2} (same columns as the pipeline)};
+    {Source stages in submission \texttt{8e9c9a2} (same columns as the pipeline)};
   \node[registerbox, text width=39mm, minimum height=14mm, font=\scriptsize] at (4.4,2.55)
     {\textbf{Coordinate differences}\\
      \texttt{tlm\_coord\_x\_sub}\\
@@ -517,13 +517,13 @@
 \newpage
 
 % ============================================================================
-% Page 5: phase 1, coordinate differences
+% Page 5: stage 1, coordinate differences
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 1: form the coordinate differences};
+    {Stage 1: form the coordinate differences};
   \node[font=\large] at (17.15,17.28)
     {$d_x=x_R-x_A\pmod p,\qquad d_y=y_R-y_A\pmod p$};
 
@@ -560,7 +560,7 @@
   \node[note, anchor=south west] at (29.0,8.15) {$Y=\ket{d_y}$};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
-    {\textbf{Phase 1 optimization stack}\\[0.8mm]
+    {\textbf{Stage 1 optimization stack}\\[0.8mm]
      {\footnotesize off-peak classical addend $\bullet$ serialized $256$-qubit workspace\\
      $53$-bit pseudo-Mersenne fold $\bullet$ $19$-bit final comparison\\
      measurement-based carry uncomputation}};
@@ -582,13 +582,13 @@
 \newpage
 
 % ============================================================================
-% Page 6: phase 1 implementation details
+% Page 6: stage 1 implementation details
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 1 detail: optimized coordinate subtraction};
+    {Stage 1 detail: optimized coordinate subtraction};
   \node[font=\large] at (17.15,17.20)
     {The group-law step is conventional; the implementation reduces its live width and nonlinear cost.};
 
@@ -690,7 +690,7 @@
      The correction $\mathrm{CZ}^{m}_{q_1,q_2}$ removes the phase exactly, omitting the reverse Toffoli. The final $b$ remains live through $-bF$ and is cleaned separately.};
 
   \node[detailgreen, text width=296mm, minimum height=16mm] at (17.15,1.55)
-    {\textbf{Interpretation.} Phase 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
+    {\textbf{Interpretation.} Stage 1 does not introduce a new point-addition identity. Its savings come from source-level liveness control, arithmetic specialized to $p$, and measurement-assisted uncomputation. The classical loading shown here is valid for the challenge's fixed-addend interface; a coherent windowed-Shor implementation instead requires a separately validated QROM lookup/use/unlookup construction.};
 
   \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.38)
     {Source correspondence: the sequential \texttt{coord\_addsub} calls and \texttt{mod\_sub\_vented} implementation in submission \texttt{8e9c9a2}.};
@@ -699,13 +699,13 @@
 \newpage
 
 % ============================================================================
-% Page 7: phase 2, dialog-GCD division
+% Page 7: stage 2, dialog-GCD division
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2: compute the slope by dialog-GCD division};
+    {Stage 2: compute the slope by dialog-GCD division};
   \node[font=\large] at (17.15,16.98)
     {$\lambda=d_y d_x^{-1}\pmod p$ while restoring $X=d_x$ and clearing the transcript};
 
@@ -754,7 +754,7 @@
   \draw[flow] (TAPE.north east) -- (REV.south west);
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
-    {\textbf{Phase 2 optimization stack}\\[0.8mm]
+    {\textbf{Stage 2 optimization stack}\\[0.8mm]
      {\footnotesize Jump-2 $\bullet$ base-$5$ dialog codec $\bullet$ streamed replay\\
      shrinking active widths $\bullet$ comparison narrowing\\
      temporary-lane reuse $\bullet$ scheduled carry venting}};
@@ -783,13 +783,13 @@
 \newpage
 
 % ============================================================================
-% Page 8: Jump-2 step used inside phase 2
+% Page 8: Jump-2 step used inside stage 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: the Jump-2 Euclidean step};
+    {Stage 2 detail: the Jump-2 Euclidean step};
   \node[font=\large] at (17.15,17.05)
     {Compute division by following the binary-GCD path of $(p,d_x)$ and updating the numerator coherently};
   \node[font=\normalsize] at (17.15,16.25)
@@ -872,13 +872,13 @@
 \newpage
 
 % ============================================================================
-% Page 9: base-5 codec and streamed replay used inside phase 2
+% Page 9: base-5 codec and streamed replay used inside stage 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: base-$5$ codec and streamed dialog replay};
+    {Stage 2 detail: base-$5$ codec and streamed dialog replay};
   \node[font=\large] at (17.15,17.28)
     {Store the coherent five-way GCD decisions near their information-theoretic minimum};
 
@@ -970,13 +970,13 @@
 \newpage
 
 % ============================================================================
-% Page 10: width scheduling and temporary reuse used inside phase 2
+% Page 10: width scheduling and temporary reuse used inside stage 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: width scheduling and qubit reuse};
+    {Stage 2 detail: width scheduling and qubit reuse};
   \node[font=\large] at (17.15,16.98)
     {The GCD state becomes smaller as the dialog grows, and short-lived workspaces are fitted into the released lanes};
 
@@ -1032,13 +1032,13 @@
 \newpage
 
 % ============================================================================
-% Page 11: phase 3, prepare X workspace
+% Page 11: stage 3, prepare X workspace
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 3: prepare the $X$ workspace};
+    {Stage 3: prepare the $X$ workspace};
   \node[font=\large] at (17.15,17.28)
     {$X=d_x\longmapsto d_x+3x_A=x_R+2x_A\pmod p,\qquad Y=\lambda$};
 
@@ -1067,12 +1067,12 @@
   \node[lab, anchor=east] at (2.2,6.95) {$Y:\ \ket{\lambda}$};
   \draw[wire] (2.35,6.95) -- (32.2,6.95);
   \node[registerbox, text width=45mm] at (20.0,6.95)
-    {$Y$ bypasses this phase unchanged};
+    {$Y$ bypasses this stage unchanged};
   \node[note, anchor=south west] at (29.0,6.95)
     {$Y=\ket{\lambda}$ (unchanged)};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
-    {\textbf{Phase 3 optimization stack}\\[0.8mm]
+    {\textbf{Stage 3 optimization stack}\\[0.8mm]
      {\footnotesize classical $3x_A\bmod p$ $\bullet$ transient $256$-qubit materialization\\
      $53$-bit fold $\bullet$ $19$-bit comparison $\bullet$ immediate unload}};
 
@@ -1083,7 +1083,7 @@
   \node[font=\large] at (17.15,3.36)
     {$d_x+3x_A=(x_R-x_A)+3x_A=x_R+2x_A$};
   \node[note, text width=29cm, align=center] at (17.15,2.38)
-    {The following phase subtracts $\lambda^2$, producing $x_R+2x_A-\lambda^2=x_A-x_{R'}$.  The submitted route uses its configured low-cost modular-adder variant; the classical multiplier does not occupy quantum storage outside this phase.};
+    {The following stage subtracts $\lambda^2$, producing $x_R+2x_A-\lambda^2=x_A-x_{R'}$.  The submitted route uses its configured low-cost modular-adder variant; the classical multiplier does not occupy quantum storage outside this stage.};
   \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.82)
     {Source correspondence: \texttt{tlm\_coord\_add3x}, \texttt{classical\_times3\_mod\_q}, and \texttt{coord\_add3x}.};
 \end{tikzpicture}
@@ -1091,13 +1091,13 @@
 \newpage
 
 % ============================================================================
-% Page 12: phase 4, specialized square
+% Page 12: stage 4, specialized square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 4: subtract the specialized modular square};
+    {Stage 4: subtract the specialized modular square};
   \node[font=\large] at (17.15,17.28)
     {$X\longmapsto X-\lambda^2=x_A-x_{R'}\pmod p,\qquad p=2^{256}-F,\quad F=2^{32}+977$};
 
@@ -1139,7 +1139,7 @@
   \node[note, anchor=south west] at (29.0,8.25) {$X=\ket{x_A-x_{R'}}$};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
-    {\textbf{Phase 4 optimization stack}\\[0.8mm]
+    {\textbf{Stage 4 optimization stack}\\[0.8mm]
      {\footnotesize three-square Karatsuba $\bullet$ symmetric squaring $\bullet$ streamed products\\
      pseudo-Mersenne NAF fold $\bullet$ from-zero adds $\bullet$ adaptive carry venting}};
 
@@ -1155,19 +1155,19 @@
   \node[note, text width=29cm, align=center] at (17.15,2.12)
     {The reduction of the $2^{256}B$ term to $FB$ exploits the pseudo-Mersenne form of the secp256k1 prime and avoids a generic full-width modular-square workspace.};
   \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.75)
-    {Source correspondence: \texttt{mod\_square\_sub\_pm\_secp256k1\_symmetric}, including the $C$, $A$, and $B$ build/apply/unbuild phases.};
+    {Source correspondence: \texttt{mod\_square\_sub\_pm\_secp256k1\_symmetric}, including the $C$, $A$, and $B$ build/apply/unbuild stages.};
 \end{tikzpicture}
 
 \newpage
 
 % ============================================================================
-% Page 13: phase 4 detail, symmetry-aware streamed Karatsuba square
+% Page 13: stage 4 detail, symmetry-aware streamed Karatsuba square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 4 detail: symmetry-aware streamed Karatsuba squaring};
+    {Stage 4 detail: symmetry-aware streamed Karatsuba squaring};
   \node[font=\large] at (17.15,17.28)
     {A standard one-level Karatsuba identity is specialized to squaring, reversible streaming, and the secp256k1 prime.};
 
@@ -1247,13 +1247,13 @@
 \newpage
 
 % ============================================================================
-% Page 14: phase 5, forward multiplication via dialog-GCD replay
+% Page 14: stage 5, forward multiplication via dialog-GCD replay
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 5: forward multiplication via dialog-GCD replay};
+    {Stage 5: forward multiplication via dialog-GCD replay};
   \node[font=\large] at (17.15,17.28)
     {$Y=\lambda\longmapsto\lambda(x_A-x_{R'})\pmod p$ while restoring $X=x_A-x_{R'}$};
 
@@ -1305,7 +1305,7 @@
     {after the walk: $X/v=\ket{0}$ on convergent inputs};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
-    {\textbf{Phase 5 optimization stack}\\[0.8mm]
+    {\textbf{Stage 5 optimization stack}\\[0.8mm]
      {\footnotesize shared Jump-2 engine $\bullet$ fresh base-$5$ dialog\\
      in-place forward multiply $\bullet$ streamed reverse replay\\
      shrinking widths $\bullet$ per-call carry schedules}};
@@ -1320,9 +1320,9 @@
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (2.0,0.42) rectangle (32.3,4.72);
   \node[font=\large\bfseries, anchor=west] at (2.4,4.37)
-    {Why dialog-GCD implements multiplication in Phase 5};
+    {Why dialog-GCD implements multiplication in Stage 5};
   \node[note, anchor=west, font=\small] at (2.55,3.78)
-    {Phase 2 realizes the in-place division unitary};
+    {Stage 2 realizes the in-place division unitary};
   \node[font=\large] at (9.25,3.24)
     {$U_{\mathrm{div}}:\ \ket{X}\ket{Y}
       \longmapsto \ket{X}\ket{YX^{-1}\bmod p}.$};
@@ -1332,10 +1332,10 @@
     {$U_{\mathrm{div}}^{-1}:\ \ket{X}\ket{Y}
       \longmapsto \ket{X}\ket{YX\bmod p}.$};
   \node[note, text width=13.2cm, align=center, font=\small] at (9.25,1.48)
-    {Thus Phase 5 reuses the low-space division construction in reverse; it does not compute $X^{-1}$.};
+    {Thus Stage 5 reuses the low-space division construction in reverse; it does not compute $X^{-1}$.};
   \node[note, text width=13.6cm, align=left, anchor=north west, font=\small]
     at (17.55,3.87)
-    {Here $X=x_A-x_{R'}$.  Phase 2's transcript described the different operand $d_x=x_R-x_A$ and was consumed during cleanup.  Phase 5 therefore constructs a fresh $\tau(X)$, whose reverse replay supplies the $X$-dependent coefficient updates that transform $\lambda$ into $\lambda X$ while restoring $X$.};
+    {Here $X=x_A-x_{R'}$.  Stage 2's transcript described the different operand $d_x=x_R-x_A$ and was consumed during cleanup.  Stage 5 therefore constructs a fresh $\tau(X)$, whose reverse replay supplies the $X$-dependent coefficient updates that transform $\lambda$ into $\lambda X$ while restoring $X$.};
   \node[detailgreen, text width=13.6cm, minimum height=9mm, align=left,
         anchor=north west, font=\scriptsize] at (17.55,2.62)
     {\textbf{Resource effect.} The in-place map reuses $X$, $Y$, $Z$, and $\tau$, avoiding the additional product register and cleanup required by a straightforward out-of-place modular multiplication.  This lowers peak-width pressure, but does not establish a Toffoli advantage: transcript replay remains a dominant gate cost.  Cleanup is exact; the product relation requires $261$-step convergence, validated only on the benchmark support.};
@@ -1346,13 +1346,13 @@
 \newpage
 
 % ============================================================================
-% Page 15: phase 6, recover affine output
+% Page 15: stage 6, recover affine output
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 6: recover the affine output coordinates};
+    {Stage 6: recover the affine output coordinates};
   \node[font=\large] at (17.15,17.28)
     {$y_{R'}=\lambda(x_A-x_{R'})-y_A,\qquad x_{R'}=x_A-(x_A-x_{R'})$};
 
@@ -1392,7 +1392,7 @@
   \node[note, anchor=south west] at (29.1,7.7) {$X=\ket{x_{R'}}$};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,17.75)
-    {\textbf{Phase 6 optimization stack}\\[0.8mm]
+    {\textbf{Stage 6 optimization stack}\\[0.8mm]
      {\footnotesize transient classical coordinates $\bullet$ fused complement-plus-add subtraction\\
      measurement-based carry cleanup $\bullet$ $53$-bit fold $\bullet$ $19$-bit comparison}};
 

@@ -31,7 +31,7 @@
   inversion/.style={gate,fill=invviolet},
   result/.style={gate,fill=outgreen},
   warning/.style={gate,fill=warnred},
-  phase/.style={gate,text width=48mm,minimum height=38mm,font=\small},
+  stage/.style={gate,text width=48mm,minimum height=38mm,font=\small},
   detail/.style={gate,text width=75mm,minimum height=30mm,font=\normalsize},
   detailwide/.style={gate,text width=135mm,minimum height=30mm,font=\normalsize},
   lab/.style={font=\large},
@@ -184,34 +184,34 @@
   \node[font=\LARGE\bfseries] at (17.15,18.0)
     {Point-addition pipeline and source correspondence};
   \node[font=\large] at (17.15,17.2)
-    {Both 825-qubit peaks occur inside the register-shared EEA phases.};
+    {Both 825-qubit peaks occur inside the register-shared EEA stages.};
 
   \node[lab,anchor=east] at (1.8,12.4) {$X:\ket{x_R}$};
   \node[lab,anchor=east] at (1.8,9.0) {$Y:\ket{y_R}$};
   \draw[wire] (2.0,12.4) -- (32.8,12.4);
   \draw[wire] (2.0,9.0) -- (32.8,9.0);
 
-  \node[phase] (P1) at (4.5,10.7)
+  \node[stage] (P1) at (4.5,10.7)
     {\textbf{1. Differences}\\[1mm]
      $X=x_A-x_R=d_x$\\$Y=y_A-y_R=d_y$\\[1mm]
      classical addend paths};
-  \node[phase,fill=invviolet] (P2) at (9.7,10.7)
+  \node[stage,fill=invviolet] (P2) at (9.7,10.7)
     {\textbf{2. Forward divide}\\[1mm]
      $\lambda=d_y/d_x$\\restore $d_x,d_y$\\[1mm]
      \textbf{peak: 825 qubits}};
-  \node[phase] (P3) at (14.9,10.7)
+  \node[stage] (P3) at (14.9,10.7)
     {\textbf{3. Zero and square}\\[1mm]
      erase $d_y$\\$X=\lambda^2-x_R-x_A$\\[1mm]
      $Y$ becomes scratch};
-  \node[phase] (P4) at (20.1,10.7)
+  \node[stage] (P4) at (20.1,10.7)
     {\textbf{4. New differences}\\[1mm]
      $X=x_A-x_{R'}$\\$Y=\lambda X$\\[1mm]
      alternate witness};
-  \node[phase,fill=invviolet] (P5) at (25.3,10.7)
+  \node[stage,fill=invviolet] (P5) at (25.3,10.7)
     {\textbf{5. Cancel divide}\\[1mm]
      recompute witness\\erase $\lambda$\\[1mm]
      \textbf{peak: 825 qubits}};
-  \node[phase,fill=outgreen] (P6) at (30.5,10.7)
+  \node[stage,fill=outgreen] (P6) at (30.5,10.7)
     {\textbf{6. Restore output}\\[1mm]
      $X=x_{R'}$\\$Y=y_{R'}$\\[1mm]
      remove pad lanes};
@@ -241,7 +241,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 1: build $d_y$ and $d_x$ with low-pressure classical loads};
+    {Stage 1: build $d_y$ and $d_x$ with low-pressure classical loads};
   \node[font=\large] at (17.15,17.2)
     {$d_y=y_A-y_R\pmod p$, followed by $d_x=x_A-x_R\pmod p$};
 
@@ -286,7 +286,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2: register-shared shrunken-PZ division};
+    {Stage 2: register-shared shrunken-PZ division};
   \node[font=\large] at (17.15,17.15)
     {A reversible extended Euclidean state machine computes $\lambda=d_y d_x^{-1}$ without a dialog transcript.};
 
@@ -334,7 +334,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: the packed Euclidean state machine};
+    {Stage 2 detail: the packed Euclidean state machine};
   \node[font=\large] at (17.15,17.15)
     {The circuit incrementally forms quotient bits and updates a remainder/coefficient pair.};
 
@@ -386,7 +386,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Phase 2 detail: register sharing and dynamic width};
+    {Stage 2 detail: register sharing and dynamic width};
   \node[font=\large] at (17.15,17.15)
     {The principal low-$Q$ gain comes from assigning physical lanes by lifetime rather than by logical register name.};
 
@@ -422,7 +422,7 @@
   \node[detail,text width=92mm,minimum height=45mm] at (27.2,5.35)
     {\textbf{Reversible lending discipline}\\[1mm]
      A borrowed lane may host temporary information only while its logical owner is inactive. Each microkernel
-     must restore the lane before the owner or a neighboring peak phase becomes live again.};
+     must restore the lane before the owner or a neighboring peak stage becomes live again.};
 \end{tikzpicture}
 \newpage
 
@@ -493,7 +493,7 @@
 
   \node[detail,text width=91mm,minimum height=48mm] at (7.0,13.25)
     {\textbf{Three Q826 host windows}\\[1mm]
-     Separate subphases lend inactive $t'$ or $\ell_s$ lanes to remainder, coefficient, and rotated-swap
+     Separate substages lend inactive $t'$ or $\ell_s$ lanes to remainder, coefficient, and rotated-swap
      microkernels. Their lifetimes are disjoint, so all three one-qubit savings can coexist.};
   \node[detail,text width=91mm,minimum height=48mm] at (17.15,13.25)
     {\textbf{Metadata relocation}\\[1mm]
@@ -563,7 +563,7 @@
      and resolves the stored phase corrections against the reconstructed register.};
   \node[detail,text width=90mm,minimum height=55mm] at (27.3,6.2)
     {\textbf{Top-lane hosting}\\[-1mm]
-     Canonical field values carry a clean $257$th lane. During selected reverse-schedule subphases, the clean
+     Canonical field values carry a clean $257$th lane. During selected reverse-schedule substages, the clean
      $\lambda$ or $d_y$ top lane hosts omitted metadata or predicate scratch, then returns to zero before the
      modular multiply or API boundary.};
 \end{tikzpicture}
@@ -630,7 +630,7 @@
     {\textbf{Cancel divide}\\peak $Q=825$\\$T=225{,}376{,}748$\\$46.07\%$ of total $T$};
 
   \draw[black!45,rounded corners=1pt] (2.0,6.3) rectangle (32.3,10.8);
-  \node[font=\large\bfseries,anchor=west] at (2.4,10.35) {Peak logical width by outer source phase};
+  \node[font=\large\bfseries,anchor=west] at (2.4,10.35) {Peak logical width by outer source stage};
   \fill[gateblue] (2.55,7.2) rectangle (6.05,8.2);
   \fill[invviolet] (7.45,7.2) rectangle (10.95,10.26);
   \fill[gateblue] (12.35,7.2) rectangle (15.85,8.26);
@@ -646,7 +646,7 @@
   }
 
   \node[detail,text width=135mm,minimum height=30mm] at (9.25,3.35)
-    {\textbf{Inversion-dominated cost.} The two EEA phases contribute $450{,}753{,}496$ Toffolis,
+    {\textbf{Inversion-dominated cost.} The two EEA stages contribute $450{,}753{,}496$ Toffolis,
      or $92.15\%$ of the circuit total. The route is therefore a hard-width witness rather than a
      product-score-efficient operating point.};
   \node[classical,text width=135mm,minimum height=30mm] at (25.05,3.35)
@@ -729,7 +729,7 @@
     {\textbf{Route configuration and instrumentation}\\[1mm]
      \texttt{src/point\_add/trailmix\_port/mod.rs}\\[1mm]
      Source-bakes the low-$Q$ flags and tail nonce, allocates the benchmark registers,
-     reports support statistics, and provides count-only phase/peak instrumentation.};
+     reports support statistics, and provides count-only stage/peak instrumentation.};
   \node[inversion,text width=140mm,minimum height=45mm,align=left] at (25.2,7.0)
     {\textbf{Arithmetic substrate}\\[1mm]
      \texttt{trailmix\_port/rfold\_mbu.rs} and \texttt{trailmix\_port/arith/}\\[1mm]
