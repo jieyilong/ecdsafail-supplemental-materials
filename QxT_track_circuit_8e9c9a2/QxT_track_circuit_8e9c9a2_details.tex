@@ -791,7 +791,10 @@
   \node[font=\LARGE\bfseries] at (17.15,18.0)
     {Phase 2 detail: the Jump-2 Euclidean step};
   \node[font=\large] at (17.15,17.05)
-    {Up to two binary-GCD halvings are represented by one reversible control symbol};
+    {Compute division by following the binary-GCD path of $(p,d_x)$ and updating the numerator coherently};
+  \node[font=\normalsize] at (17.15,16.25)
+    {$\alpha p+\beta d_x=1\ \Longrightarrow\ \beta\equiv d_x^{-1}\pmod p
+      \ \Longrightarrow\ \lambda=d_y\beta\equiv d_y/d_x\pmod p$};
 
   \node[detailviolet, text width=35mm, minimum height=23mm] (S0) at (3.3,13.4)
     {active state\\[1mm]
@@ -823,34 +826,46 @@
   \draw[flow] (S4.east) -- (S5.west);
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
-    (1.25,6.55) rectangle (13.3,10.65);
+    (1.25,6.10) rectangle (13.3,10.65);
   \node[font=\large\bfseries, anchor=west] at (1.7,10.18)
-    {Only five symbols are reachable};
-  \node[note, text width=10.7cm, align=left, anchor=west] at (1.7,9.35)
-    {$s_2=0\Rightarrow b=1$, because the value remaining after the first halving is odd; $b=0\Rightarrow s=0$, because swapping is enabled only on a subtraction step.};
+    {Jump-2 in one equation};
+  \node[font=\normalsize] at (7.25,9.15)
+    {$\displaystyle
+      v\longmapsto
+      \begin{cases}
+        v/2, & v/2\text{ is odd},\\
+        v/4, & v/2\text{ is even}.
+      \end{cases}$};
+  \node[note, text width=10.8cm, align=center] at (7.25,8.12)
+    {After halving, compare $u$ and $v$, optionally swap, and subtract.  The symbol
+     $\sigma=(b,s,s_2)$ records subtraction, swapping, and the second halving, respectively.};
+  \node[note, text width=10.8cm, align=center] at (7.25,7.50)
+    {Only five values occur: $s_2=0\Rightarrow b=1$ and $b=0\Rightarrow s=0$.};
   \foreach \x/\sym/\fillcol in {
-      2.25/{(1,0,0)}/gateblue,
-      4.65/{(1,1,0)}/addviolet,
-      7.05/{(0,0,1)}/lookorange,
-      9.45/{(1,0,1)}/outgreen,
+      2.45/{(1,0,0)}/gateblue,
+      4.80/{(1,1,0)}/addviolet,
+      7.15/{(0,0,1)}/lookorange,
+      9.50/{(1,0,1)}/outgreen,
       11.85/{(1,1,1)}/gateblue}
     {\node[registerbox, fill=\fillcol, minimum width=20mm, minimum height=9mm]
-       at (\x,7.55) {$\sym$};}
+       at (\x,6.72) {$\sym$};}
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (14.1,6.55) rectangle (33.0,10.65);
   \node[font=\large\bfseries, anchor=west] at (14.55,10.18)
-    {Why the recorded symbol is sufficient};
+    {The same decisions construct the quotient};
   \node[note, text width=17.6cm, align=left, anchor=west] at (14.55,9.13)
-    {The walk applies a data-dependent linear update $M$ to $(u,v)$, where $v$ is physically the coordinate register $X$.  The paired arithmetic applies $M^{-T}$ directly to physical registers $(Y,Z)$, preserving the division relation.  The bit $s_2$ selects whether this update contains one or two powers of two, while $b$ and $s$ select subtraction and operand order.};
+    {Every halving, swap, and subtraction is a linear update $M$ of the Euclidean pair $(u,v)$.  The same live controls apply the corresponding coefficient update $M^{-T}$ to $(Y,Z)$.  Thus the GCD walk reduces $(p,d_x)$ toward $(1,0)$ while the paired update turns the numerator $d_y$ into $d_y d_x^{-1}=\lambda$.};
   \node[font=\normalsize] at (23.55,7.48)
     {$\text{walk: }(u,v)\xrightarrow{\ M\ }(u',v')
       \qquad\Longleftrightarrow\qquad
       \text{physical pair: }(Y,Z)\xrightarrow{\ M^{-T}\ }(Y',Z')$};
 
-  \node[note, text width=30cm, align=center] at (17.15,4.65)
-    {Compared with a one-step binary-GCD schedule, Jump-2 packages the mandatory halving and a possible second halving into one recorded iteration.  Submission \texttt{8e9c9a2} executes 261 such iterations and replays their symbols in reverse order to recover the quotient while restoring the Euclidean workspace.};
-  \node[note, text width=30cm, align=center, font=\small\itshape] at (17.15,2.55)
+  \node[note, text width=30cm, align=center] at (17.15,4.85)
+    {Jump-2 packages the mandatory halving, an optional second halving, and the subsequent operand-order/subtraction choice into one recorded instruction.  It therefore makes more Euclidean progress per transcript symbol than a one-halving schedule.};
+  \node[note, text width=30cm, align=center] at (17.15,3.35)
+    {Because the choices depend on the quantum value $d_x$, they may be entangled with the input and cannot be measured or discarded.  Submission \texttt{8e9c9a2} stores 261 coherent symbols, uses their live controls to form $\lambda$, and replays them backward to restore $X=d_x$ and clean the workspace.};
+  \node[note, text width=30cm, align=center, font=\small\itshape] at (17.15,1.65)
     {Implementation correspondence: \texttt{forward\_gcd\_jump}, \texttt{apply\_step\_reverse}, \texttt{apply\_step\_forward}, and \texttt{reverse\_gcd\_jump}.};
 \end{tikzpicture}
 
@@ -865,7 +880,7 @@
   \node[font=\LARGE\bfseries] at (17.15,18.0)
     {Phase 2 detail: base-$5$ codec and streamed dialog replay};
   \node[font=\large] at (17.15,17.28)
-    {Compress the five-way Jump-2 control alphabet, then decode only the symbols needed by the active replay step};
+    {Store the coherent five-way GCD decisions near their information-theoretic minimum};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (1.1,10.65) rectangle (10.4,15.95);
@@ -878,17 +893,25 @@
   \node[font=\normalsize] at (5.75,12.15)
     {$\phi:\{\sigma\}\longrightarrow\{0,1,2,3,4\}$};
   \node[note, text width=8.0cm, align=center] at (5.75,11.28)
-    {Here $\phi$ denotes any fixed bijection; the circuit implements it as a reversible Boolean network.};
+    {$\phi$ is implemented as a reversible basis-state permutation: no decision is measured, copied classically, or discarded.};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (11.2,10.65) rectangle (22.5,15.95);
   \node[font=\large\bfseries] at (16.85,15.42) {2. Pack three symbols};
-  \node[font=\normalsize] at (16.85,14.15)
-    {$d_j=\phi(\sigma_j),\qquad z=d_0+5d_1+25d_2$};
-  \node[font=\large] at (16.85,12.88)
-    {$5^3=125<2^7$};
-  \node[detailgreen, text width=49mm, minimum height=10mm] at (16.85,11.55)
-    {$3\times3=9$ raw qubits $\longrightarrow 7$ encoded qubits};
+  \node[note, text width=9.8cm, align=center] at (16.85,14.50)
+    {A naive encoding stores each Jump-2 symbol in three qubits.  Because only five values occur, each symbol can instead be regarded as one base-$5$ digit};
+  \node[font=\normalsize] at (16.85,13.55)
+    {$d_j=\phi(\sigma_j)\in\{0,1,2,3,4\}$};
+  \node[note, text width=9.8cm, align=center] at (16.85,12.92)
+    {Three such digits can be packed as};
+  \node[font=\normalsize] at (16.85,12.30)
+    {$z=d_0+5d_1+25d_2$};
+  \node[font=\normalsize] at (16.85,11.68)
+    {$0\leq z\leq5^3-1=124<128=2^7$};
+  \node[font=\normalsize] at (16.85,11.08)
+    {$3\cdot3=9
+      \quad\longrightarrow\quad
+      \left\lceil\log_2(5^3)\right\rceil=7\text{ qubits}$};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (23.3,10.65) rectangle (33.2,15.95);
@@ -929,7 +952,7 @@
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
     (1.1,1.3) rectangle (33.2,4.85);
   \node[font=\large\bfseries, anchor=west] at (1.55,4.38)
-    {The width reduction comes from scheduling as well as encoding};
+    {Compression and scheduling jointly reduce peak width};
   \draw[fill=gateblue, draw=black!60] (2.0,2.30) rectangle (13.8,3.05);
   \draw[fill=lookorange, draw=black!60] (13.8,2.30) rectangle (18.2,3.05);
   \node[font=\normalsize] at (7.9,2.68) {shrinking Euclidean registers $u,v$};
@@ -939,7 +962,7 @@
   \node[font=\normalsize] at (22.2,2.68) {remaining $u,v$};
   \node[font=\normalsize] at (28.35,2.68) {compressed tape $\tau$};
   \node[note, text width=29cm, align=center] at (17.15,1.72)
-    {As the active Euclidean registers narrow, $\tau$ grows into the released space. Streamed decoding consumes its symbols during reverse replay, restores the Euclidean workspace, and returns the transcript ancillas to $\ket{0}$.};
+    {$\tau$ is a quantum transcript entangled with $d_x$, not a classical log.  As the active Euclidean registers narrow, the encoded tape grows into their released space; reverse replay decodes only the current group, consumes its symbols, restores the Euclidean workspace, and returns the transcript ancillas to $\ket{0}$.};
   \node[note, text width=30cm, align=center, font=\small\itshape] at (17.15,0.62)
     {Source terminology: this slide describes \texttt{DialogCodec::Pair} and \texttt{DialogCodec::Triple}; related source paths and development notes use the ``K5 codec'' jargon for the corresponding five-symbol encoding idea.};
 \end{tikzpicture}
