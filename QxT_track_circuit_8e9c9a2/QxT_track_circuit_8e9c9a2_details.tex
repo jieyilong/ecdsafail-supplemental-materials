@@ -56,7 +56,104 @@
 \begin{document}
 
 % ============================================================================
-% Page 1: full ECDLP circuit with the U_f window wiring expanded
+% Page 1: Shor/ECDLP and windowed-addition background
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Background: Shor's algorithm for the elliptic-curve discrete logarithm};
+  \node[font=\large] at (17.15,17.30)
+    {Given a generator $P$ of prime order $r$ and $Q=[k]P$, recover the private scalar $k$};
+
+  % Hidden-period reduction.
+  \draw[black!45, line width=0.7pt, rounded corners=1pt]
+    (1.0,10.75) rectangle (16.75,16.75);
+  \node[font=\Large\bfseries, anchor=west] at (1.45,16.28)
+    {1. Encode $k$ as a hidden period};
+  \node[note, text width=14.4cm, align=left, anchor=north west,
+        font=\normalsize] at (1.45,15.82)
+    {Define a two-dimensional probe function over the elliptic-curve group:};
+  \node[font=\Large] at (8.88,14.82)
+    {$f(u,v)=[u]P+[v]Q=[u+kv]P.$};
+  \node[note, text width=14.4cm, align=left, anchor=north west,
+        font=\normalsize] at (1.45,14.20)
+    {Because one additional copy of $Q$ equals $k$ copies of $P$,};
+  \node[font=\Large] at (8.88,13.20)
+    {$f(u-k,v+1)=f(u,v).$};
+  \node[note, text width=14.4cm, align=left, anchor=north west,
+        font=\normalsize] at (1.45,12.60)
+    {Thus $(-k,1)$ generates the hidden period subgroup.  The double-scalar multiplication $[u]P+[v]Q$ is therefore the oracle whose periodicity encodes $k$; Fourier sampling reveals a vector orthogonal to that period.};
+
+  % Top-level quantum routine.
+  \draw[black!45, line width=0.7pt, rounded corners=1pt]
+    (17.45,10.75) rectangle (33.30,16.75);
+  \node[font=\Large\bfseries, anchor=west] at (17.90,16.28)
+    {2. Coherent evaluation and Fourier sampling};
+  \node[note, text width=14.5cm, align=left, anchor=north west,
+        font=\normalsize] at (17.90,15.78)
+    {Prepare two $t$-qubit scalar registers, with $M=2^t\gtrsim r$, and a point accumulator initialized to $\mathcal O$:};
+  \node[font=\large] at (25.37,14.63)
+    {$\displaystyle
+      \frac{1}{M}\sum_{u,v=0}^{M-1}\ket{u,v}\ket{\mathcal O}
+      \xrightarrow{\ U_f\ }
+      \frac{1}{M}\sum_{u,v=0}^{M-1}\ket{u,v}\ket{[u]P+[v]Q}.$};
+  \node[note, text width=14.5cm, align=left, anchor=north west,
+        font=\normalsize] at (17.90,13.63)
+    {Apply the two-register Fourier transform (or its semiclassical implementation), measure $(s,t)$, and classically recover and verify};
+  \node[font=\Large] at (25.37,12.50)
+    {$t\equiv ks\pmod r,\qquad k\equiv ts^{-1}\pmod r,\qquad [k]P\stackrel{?}{=}Q.$};
+  \node[note, text width=14.5cm, align=center, font=\small] at (25.37,11.45)
+    {The Fourier convention may reverse a sign; the recoverable modular relation is unchanged in substance.};
+
+  % Windowed implementation of U_f.
+  \draw[black!45, line width=0.7pt, rounded corners=1pt]
+    (1.0,0.72) rectangle (33.30,10.10);
+  \node[font=\Large\bfseries, anchor=west] at (1.45,9.66)
+    {3. Evaluate $U_f$ by coherent windowed point additions};
+  \node[font=\large] at (17.15,8.70)
+    {$\displaystyle
+      u=\sum_{j=0}^{\ell-1} u_j2^{jw},\qquad
+      v=\sum_{j=0}^{\ell-1} v_j2^{jw},\qquad
+      \ell=\left\lceil\frac{n}{w}\right\rceil.$};
+  \node[font=\large] at (17.15,7.22)
+    {$\displaystyle
+      [u]P+[v]Q
+      =\sum_{j=0}^{\ell-1}[u_j]P_j
+       +\sum_{j=0}^{\ell-1}[v_j]Q_j,
+      \qquad P_j=[2^{jw}]P,\quad Q_j=[2^{jw}]Q.$};
+  \node[note, text width=29.5cm, align=center, font=\normalsize] at (17.15,6.42)
+    {For each coherent $w$-bit address $z\in\{u_j,v_j\}$, a QROM table $T_j$ supplies the selected precomputed point, the point is added to the accumulator, and the lookup workspace is uncomputed:};
+  \node[font=\large] at (17.15,5.40)
+    {$\displaystyle
+      \ket{z}\ket{0}_A\ket{R}
+      \xrightarrow{\mathrm{lookup}}
+      \ket{z}\ket{T_j[z]}_A\ket{R}
+      \xrightarrow{\mathrm{add}}
+      \ket{z}\ket{T_j[z]}_A\ket{R+T_j[z]}
+      \xrightarrow{\mathrm{unlookup}}
+      \ket{z}\ket{0}_A\ket{R+T_j[z]}.$};
+  \node[note, text width=29.5cm, align=center, font=\normalsize] at (17.15,4.48)
+    {The window register is preserved as a coherent address; it is not merely a single CCX-style control bit.  For $n=256$ and $w=16$, there are $\ell=16$ windows per scalar and $32$ conceptual point-addition updates before boundary-level reductions.};
+
+  \node[detailgreen, text width=28.8cm, minimum height=18mm,
+        font=\normalsize] at (17.15,2.24)
+    {\textbf{Scope of this deck and submission \texttt{8e9c9a2}.}
+     The analyzed source implements the in-place mixed-addition body
+     $R\mapsto R+A$ for one classically known, temporarily materialized addend
+     $A=(x_A,y_A)$.  Under the challenge evaluator, it reaches
+     $Q=1{,}151$ peak logical qubits and $T=1{,}299{,}453$ average executed
+     Toffoli gates, giving $S=Q\times T=1{,}495{,}670{,}403$.
+     It does not implement the scalar registers, Fourier transforms, or QROM
+     lookup/unlookup shown above.  Embedding it into a fully coherent windowed-Shor
+     circuit therefore requires a separately specified and validated
+     lookup--use--unlookup interface for the selected point.};
+\end{tikzpicture}
+
+\newpage
+
+% ============================================================================
+% Page 2: full ECDLP circuit with the U_f window wiring expanded
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -176,7 +273,7 @@
 \newpage
 
 % ============================================================================
-% Page 2: generic in-place point addition and its Shor-window interpretation
+% Page 3: generic in-place point addition and its Shor-window interpretation
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -279,13 +376,13 @@
 \newpage
 
 % ============================================================================
-% Page 3: inside one point-addition box
+% Page 4: inside one point-addition box
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
 
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {From the point-addition algorithm to the \texttt{8e9c9a2} pipeline};
+    {From the point-addition algorithm to the \texttt{8e9c9a2} submission};
   \node[font=\large] at (17.15,17.35)
     {Example: $+[u_1 2^{16}]P$, with selected addend $A=[u_1 2^{16}]P$ and output $R'=R+A$};
 
@@ -420,7 +517,7 @@
 \newpage
 
 % ============================================================================
-% Page 4: phase 1, coordinate differences
+% Page 5: phase 1, coordinate differences
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -485,7 +582,7 @@
 \newpage
 
 % ============================================================================
-% Page 5: phase 1 implementation details
+% Page 6: phase 1 implementation details
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -602,7 +699,7 @@
 \newpage
 
 % ============================================================================
-% Page 6: phase 2, dialog-GCD division
+% Page 7: phase 2, dialog-GCD division
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -686,7 +783,7 @@
 \newpage
 
 % ============================================================================
-% Page 7: Jump-2 step used inside phase 2
+% Page 8: Jump-2 step used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -760,7 +857,7 @@
 \newpage
 
 % ============================================================================
-% Page 8: base-5 codec and streamed replay used inside phase 2
+% Page 9: base-5 codec and streamed replay used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -850,7 +947,7 @@
 \newpage
 
 % ============================================================================
-% Page 9: width scheduling and temporary reuse used inside phase 2
+% Page 10: width scheduling and temporary reuse used inside phase 2
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -912,7 +1009,7 @@
 \newpage
 
 % ============================================================================
-% Page 10: phase 3, prepare X workspace
+% Page 11: phase 3, prepare X workspace
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -971,7 +1068,7 @@
 \newpage
 
 % ============================================================================
-% Page 11: phase 4, specialized square
+% Page 12: phase 4, specialized square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -1041,7 +1138,7 @@
 \newpage
 
 % ============================================================================
-% Page 12: phase 4 detail, symmetry-aware streamed Karatsuba square
+% Page 13: phase 4 detail, symmetry-aware streamed Karatsuba square
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -1127,7 +1224,7 @@
 \newpage
 
 % ============================================================================
-% Page 13: phase 5, forward multiplication via dialog-GCD replay
+% Page 14: phase 5, forward multiplication via dialog-GCD replay
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -1135,49 +1232,54 @@
   \node[font=\LARGE\bfseries] at (17.15,18.0)
     {Phase 5: forward multiplication via dialog-GCD replay};
   \node[font=\large] at (17.15,17.28)
-    {$Y=\lambda\longmapsto\lambda X=\lambda(x_A-x_{R'})\pmod p$ while preserving $X$};
+    {$Y=\lambda\longmapsto\lambda(x_A-x_{R'})\pmod p$ while restoring $X=x_A-x_{R'}$};
 
   \node[lab, anchor=east] at (2.2,13.5) {$X:$};
   \node[note, anchor=west] at (2.55,13.88)
     {input $\ket{x_A-x_{R'}}$};
   \node[lab, anchor=east] at (2.2,8.7) {$Y:\ \ket{\lambda}$};
-  \node[lab, anchor=east] at (2.2,5.35) {$Z:\ \ket{0}^{\otimes256}$};
   \draw[wire] (2.35,13.5) -- (32.2,13.5);
   \draw[wire] (2.35,8.7) -- (32.2,8.7);
-  \draw[wire] (2.35,5.35) -- (32.2,5.35);
 
-  \node[detailviolet, text width=35mm] (SW2) at (5.0,7.02)
-    {move multiplier\\into scratch\\[1mm]
-     $Y\leftrightarrow Z$};
-  \draw[wire] (5.0,8.7) -- (SW2.north);
-  \draw[wire] (5.0,5.35) -- (SW2.south);
-
-  \node[detailviolet, text width=48mm] (WALK2) at (10.3,13.5)
-    {forward Jump-2 GCD walk\\on $(p,X)$\\[1mm]
-     preserve $X$ through a\\compressed transcript $\tau$};
-  \node[lookup, text width=35mm] (PREG2) at (10.3,15.85)
+  \node[detailviolet, text width=48mm] (WALK2) at (9.3,13.5)
+    {forward Euclidean reduction\\(Jump-2 GCD walk on $(p,X)$)\\[1mm]
+     temporarily transform $X=v$;\\record the reversible transcript $\tau$};
+  \node[lookup, text width=35mm] (PREG2) at (9.3,15.85)
     {initialize\\$u\gets p$};
   \draw[wire] (PREG2.south) -- (WALK2.north);
 
-  \node[detailorange, text width=50mm] (TAPE2) at (16.0,11.1)
+  \node[detailorange, text width=50mm] (TAPE2) at (14.8,11.1)
     {$\tau$: quantum transcript register\\[0.7mm]
      stores the compressed symbols\\
-     needed to reverse the GCD path for $X$};
+     for $X=x_A-x_{R'}$};
   \draw[flow] (WALK2.south east) -- (TAPE2.north west);
 
-  \node[detailviolet, text width=50mm] (REPLAY2) at (22.0,7.02)
+  % In Direction::Forward, this clean lane is allocated only after the walk.
+  \node[lab, anchor=east] at (14.1,5.35) {$Z:\ \ket{0}^{\otimes256}$};
+  \draw[wire] (14.25,5.35) -- (32.2,5.35);
+  \node[detailviolet, text width=52mm] (SW2) at (16.7,7.02)
+    {prepare the multiplicand pair\\[0.8mm]
+     allocate clean $256$-qubit ancilla $Z$ after the walk\\
+     $(Y,Z):(\lambda,0)\longmapsto(0,\lambda)$};
+  \draw[wire] (16.7,8.7) -- (SW2.north);
+  \draw[wire] (16.7,5.35) -- (SW2.south);
+
+  \node[detailviolet, text width=50mm] (REPLAY2) at (23.2,7.02)
     {decode $\tau$ in reverse and apply\\the forward-transpose updates\\[1mm]
      $\ket{0}_Y\ket{\lambda}_Z\mapsto
-      \ket{\lambda X}_Y\ket{0}_Z$};
+      \ket{\lambda(x_A-x_{R'})}_Y\ket{0}_Z$};
   \draw[flow] (TAPE2.south east) -- (REPLAY2.north west);
-  \draw[wire] (22.0,8.7) -- (REPLAY2.north);
-  \draw[wire] (22.0,5.35) -- (REPLAY2.south);
+  \draw[wire] (23.2,8.7) -- (REPLAY2.north);
+  \draw[wire] (23.2,5.35) -- (REPLAY2.south);
 
   \node[detailgreen, text width=43mm] (CLEAN2) at (28.5,13.5)
-    {finish reverse replay\\[1mm]
+    {reverse Euclidean walk\\[1mm]
      consume $\tau$; restore $X$;\\
      clear Euclidean workspace};
   \draw[flow] (TAPE2.north east) -- (CLEAN2.south west);
+
+  \node[note, anchor=south west] at (13.0,13.5)
+    {after the walk: $X/v=\ket{0}$ on convergent inputs};
 
   \node[detail, anchor=north east, text width=70mm, minimum height=12mm] at (32.0,16.95)
     {\textbf{Phase 5 optimization stack}\\[0.8mm]
@@ -1187,28 +1289,41 @@
 
   \node[note, anchor=north east] at (32.0,12.55)
     {$X=\ket{x_A-x_{R'}}$ (restored)};
-  \node[note, anchor=south west] at (29.6,8.7) {$Y=\ket{\lambda X}$};
+  \node[note, anchor=south west] at (28.6,8.7)
+    {$Y=\ket{\lambda(x_A-x_{R'})}$ (when convergent)};
   \node[note, anchor=south west] at (29.1,5.35)
     {$Z=\ket{0}^{\otimes256}$ (clean and released)};
 
   \draw[black!50, line width=0.7pt, rounded corners=1pt]
-    (2.0,1.05) rectangle (32.3,3.92);
-  \node[font=\large\bfseries, anchor=west] at (2.4,3.52)
-    {Why the division machinery is reused};
-  \node[note, text width=29cm, align=center] at (17.15,2.72)
-    {Multiplication by a quantum value must remain reversible.  The source therefore runs the same in-place division construction in the opposite direction: the GCD path for $X$ is recorded, replayed onto $(0,\lambda)$, and then erased.};
-  \node[font=\large] at (17.15,1.78)
-    {$\ket{X}_X\ket{\lambda}_Y\ket{0}_Z
-      \longmapsto
-      \ket{X}_X\ket{\lambda X}_Y\ket{0}_Z$};
-  \node[note, text width=29cm, align=center, font=\small\itshape] at (17.15,0.70)
-    {Source correspondence: \texttt{mod\_mul\_inverse\_in\_place(..., Direction::Forward)} and reverse replay with \texttt{apply\_step\_forward}.};
+    (2.0,0.42) rectangle (32.3,4.72);
+  \node[font=\large\bfseries, anchor=west] at (2.4,4.37)
+    {Why dialog-GCD implements multiplication in Phase 5};
+  \node[note, anchor=west, font=\small] at (2.55,3.78)
+    {Phase 2 realizes the in-place division unitary};
+  \node[font=\large] at (9.25,3.24)
+    {$U_{\mathrm{div}}:\ \ket{X}\ket{Y}
+      \longmapsto \ket{X}\ket{YX^{-1}\bmod p}.$};
+  \node[note, anchor=west, font=\small] at (2.55,2.66)
+    {Reversibility therefore gives};
+  \node[font=\large] at (9.25,2.12)
+    {$U_{\mathrm{div}}^{-1}:\ \ket{X}\ket{Y}
+      \longmapsto \ket{X}\ket{YX\bmod p}.$};
+  \node[note, text width=13.2cm, align=center, font=\small] at (9.25,1.48)
+    {Thus Phase 5 reuses the low-space division construction in reverse; it does not compute $X^{-1}$.};
+  \node[note, text width=13.6cm, align=left, anchor=north west, font=\small]
+    at (17.55,3.87)
+    {Here $X=x_A-x_{R'}$.  Phase 2's transcript described the different operand $d_x=x_R-x_A$ and was consumed during cleanup.  Phase 5 therefore constructs a fresh $\tau(X)$, whose reverse replay supplies the $X$-dependent coefficient updates that transform $\lambda$ into $\lambda X$ while restoring $X$.};
+  \node[detailgreen, text width=13.6cm, minimum height=9mm, align=left,
+        anchor=north west, font=\scriptsize] at (17.55,2.62)
+    {\textbf{Resource effect.} The in-place map reuses $X$, $Y$, $Z$, and $\tau$, avoiding the additional product register and cleanup required by a straightforward out-of-place modular multiplication.  This lowers peak-width pressure, but does not establish a Toffoli advantage: transcript replay remains a dominant gate cost.  Cleanup is exact; the product relation requires $261$-step convergence, validated only on the benchmark support.};
+  \node[note, text width=29cm, align=center, font=\scriptsize\itshape] at (17.15,0.16)
+    {Source correspondence: \texttt{mod\_mul\_inverse\_in\_place(..., Direction::Forward)}, \texttt{ITERS=261}, and reverse replay with \texttt{apply\_step\_forward}.};
 \end{tikzpicture}
 
 \newpage
 
 % ============================================================================
-% Page 14: phase 6, recover affine output
+% Page 15: phase 6, recover affine output
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
