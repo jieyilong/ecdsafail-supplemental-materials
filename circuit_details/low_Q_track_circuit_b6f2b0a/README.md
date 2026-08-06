@@ -15,10 +15,10 @@ Structural count-only instrumentation reproduced the submitted metrics:
 - Product: 403,558,567,500
 - Peak phases: `ec3.inv_fwd` and `ec3.alt.cancel`
 
-The deck distinguishes the accumulated low-qubit architecture from the submission-specific Q825 change: removal of the eighth persistent quotient-length lane using an implicit high-bit reconstruction and an eight-scratch split-five kernel. It also documents the exact 825-qubit live set, the register-shared EEA layout and fixed schedule, the three inherited Q826 hosting windows, dynamic cursor reconstruction, measurement-based release and recomputation, and the alternate-witness cancellation pass.
+The deck distinguishes the accumulated low-qubit architecture from the submission-specific Q825 change: removal of the eighth persistent quotient-length lane using an implicit high-bit reconstruction and an eight-scratch split-five kernel. It also explains the Shrunken-PZ lineage and underlying extended-Euclidean inversion algorithm, and documents the exact 825-qubit live set, the register-shared EEA layout and fixed schedule, the three inherited Q826 hosting windows, dynamic cursor reconstruction, measurement-based release and recomputation, and the alternate-witness cancellation pass.
 
 ## Verification notes
 
 - The release builder completed with count-only phase instrumentation and reproduced `Q=825` and `T=489161900` exactly.
-- The 23-page PDF compiles without overfull-box or undefined-reference warnings and was rendered page by page for visual inspection.
+- The 25-page PDF compiles without overfull-box or undefined-reference warnings and was rendered page by page for visual inspection.
 - The historical source snapshot's complete Rust test target does not currently compile because unrelated test-only modules reference missing experimental helpers and obsolete simulator methods. This does not affect the successful release build or the structural count used in the deck.

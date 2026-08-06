@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 \usepackage[paperwidth=14in,paperheight=7.9in,margin=0.22in]{geometry}
 \usepackage{amsmath,amssymb,booktabs,array}
 \usepackage{tikz}
@@ -15,11 +15,13 @@
 
 \newcommand{\ket}[1]{\left\lvert #1\right\rangle}
 \newcommand{\F}{\mathbb F}
-\definecolor{gateblue}{RGB}{239,246,253}
-\definecolor{lookorange}{RGB}{255,245,231}
-\definecolor{invviolet}{RGB}{245,241,252}
-\definecolor{outgreen}{RGB}{238,248,241}
-\definecolor{warnred}{RGB}{252,240,239}
+% Restrained functional palette: sufficiently distinct for navigation while
+% remaining pale enough that equations and register states stay dominant.
+\definecolor{gateblue}{RGB}{241,246,251}
+\definecolor{lookorange}{RGB}{252,247,238}
+\definecolor{invviolet}{RGB}{247,244,250}
+\definecolor{outgreen}{RGB}{241,248,243}
+\definecolor{warnred}{RGB}{252,244,244}
 
 \tikzset{
   wire/.style={black,line width=0.9pt},
@@ -73,8 +75,8 @@
      maximum number of simultaneously live logical qubits.};
 
   \node[warning,text width=278mm,minimum height=31mm] at (17.15,5.25)
-    {\textbf{Evidential status.} The public row is marked \emph{rejected}, but its note reports an
-     isolated replay of all $9{,}024$ challenge tests with zero classical, phase, and ancilla
+    {\textbf{Evidential status.} An isolated replay of all $9{,}024$ challenge tests reports
+     zero classical, phase, and ancilla
      failures. The seven-bit quotient-length promise is tied to that finite validation support;
      the deck does not promote it to an all-input proof or a full windowed-Shor resource estimate.};
 
@@ -86,6 +88,61 @@
 
 % ============================================================================
 % Page 2
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {What ``Shrunken-PZ'' means};
+  \node[font=\large] at (17.15,17.15)
+    {A low-width reversible organization of Proos--Zalka-style modular inversion};
+
+  \node[detail,text width=91mm,minimum height=58mm] at (6.1,12.9)
+    {\textbf{1. Mathematical task}\\[1mm]
+     For $x\ne0\pmod p$, an extended Euclidean computation produces a coefficient $t$ such that
+     \[
+       tx+sp=\gcd(x,p)=1,
+       \qquad t\equiv x^{-1}\pmod p.
+     \]
+     The point-addition circuit uses this map to compute
+     $\lambda=d_y d_x^{-1}\bmod p$.};
+
+  \node[inversion,text width=91mm,minimum height=58mm] at (17.15,12.9)
+    {\textbf{2. Why it is ``shrunken''}\\[1mm]
+     During the Euclidean recurrence, the remainders become shorter while the B\'ezout
+     coefficients grow. Rather than reserve separate full-width registers for every quantity,
+     the implementation tracks their current lengths and packs nonoverlapping values into
+     shared fixed-width banks.};
+
+  \node[result,text width=91mm,minimum height=58mm] at (28.2,12.9)
+    {\textbf{3. The implementation used here}\\[1mm]
+     Submission \texttt{b6f2b0a} uses the register-shared descendant of this architecture:
+     two $259$-qubit work banks, compact length/control metadata, and a fixed schedule of
+     $1{,}479$ reversible steps. Dynamic cursors address only the active packed fields.};
+
+  \draw[flow] (10.95,12.9) -- (12.25,12.9);
+  \draw[flow] (22.05,12.9) -- (23.35,12.9);
+
+  \node[detailwide,text width=279mm,minimum height=38mm] at (17.15,7.55)
+    {\textbf{Packed state in \texttt{b6f2b0a}.} One bank contains the evolving coefficient,
+     quotient, and remainder $(t,q,r)$; the other contains $(t',r')$. Their source-enforced
+     live-width bounds are
+     \[
+       \operatorname{bitlen}(t)+1+\operatorname{bitlen}(q)+\operatorname{bitlen}(r)\le259,
+       \qquad
+       \operatorname{bitlen}(t')+\operatorname{bitlen}(r')\le259.
+     \]
+     Reusing the space vacated by shrinking values is the central width-saving mechanism.};
+
+  \node[warning,text width=279mm,minimum height=32mm] at (17.15,3.35)
+    {\textbf{Not dialog-GCD.} ``Shrunken-PZ'' is project shorthand for this low-width
+     Proos--Zalka-style EEA lineage. The Q825 circuit carries the complete packed Euclidean
+     state and reverses the scheduled updates to clean it; it does \emph{not} store a compressed
+     branch transcript for later dialog-GCD replay.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Page 3
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -385,7 +442,105 @@
 \newpage
 
 % ============================================================================
-% Page 6
+% Algorithmic background for Stage 2
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 2: Algorithm behind shrunken-PZ modular inversion};
+  \node[font=\large] at (17.15,17.15)
+    {Restoring long division inside a reversible extended-Euclidean schedule};
+
+  % Pseudocode panel.
+  \draw[line width=0.9pt,rounded corners=1pt]
+    (0.75,0.25) rectangle (33.55,16.45);
+  \node[anchor=west,font=\Large\bfseries] at (1.15,15.95)
+    {Register-shared modular inverse};
+  \draw[black!55,line width=0.6pt] (1.0,15.45)--(33.3,15.45);
+  \node[anchor=west,font=\large,text width=30.8cm,align=left] at (1.15,14.95)
+    {\textbf{Input:} $x\in\{1,\ldots,p-1\}$ for the odd prime $p$.
+     \quad \textbf{Output:} $z=x^{-1}\bmod p$; all work registers are restored.};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,13.85) {1.};
+  \node[anchor=west,font=\large] at (2.05,13.85)
+    {$x_0\gets\min(x,p-x)$; \quad $\pi\gets[x>p/2]$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,13.85)
+    {$\triangleright\ x_0\equiv(-1)^\pi x\pmod p$};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,12.65) {2.};
+  \node[anchor=west,font=\large] at (2.05,12.65)
+    {$(t,r)\gets(1,p)$; \quad $(t',r')\gets(0,x_0)$; \quad $q\gets0$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,12.65)
+    {$\triangleright\ $ initialize the two packed Euclidean pairs};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,11.45) {3.};
+  \node[anchor=west,font=\large] at (2.05,11.45)
+    {\textbf{while} $r'\neq0$ \textbf{do}};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,11.45)
+    {$\triangleright\ \gcd(r,r')=1$};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,10.25) {4.};
+  \node[anchor=west,font=\large] at (3.15,10.25)
+    {$q\gets0$; \quad $j\gets\operatorname{bitlen}(r)-\operatorname{bitlen}(r')$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,10.25)
+    {$\triangleright\ $ begin one restoring division};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,9.05) {5.};
+  \node[anchor=west,font=\large] at (3.15,9.05)
+    {\textbf{for} $j,j-1,\ldots,0$ \textbf{do}};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,7.85) {6.};
+  \node[anchor=west,font=\large] at (4.25,7.85)
+    {\textbf{if} $r\ge 2^j r'$ \textbf{then} $r\gets r-2^j r'$; \quad $q\gets q+2^j$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,7.85)
+    {$\triangleright\ q=\lfloor r_{\rm in}/r'\rfloor$};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,6.65) {7.};
+  \node[anchor=west,font=\large] at (3.15,6.65)
+    {$t'\gets t'+qt$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,6.65)
+    {$\triangleright\ $ consume the same quotient bits in reverse order};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,5.45) {8.};
+  \node[anchor=west,font=\large] at (3.15,5.45)
+    {$((t,r),(t',r'))\gets((t',r'),(t,r))$; \quad $\pi\gets\pi\oplus1$.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,5.45)
+    {$\triangleright\ $ advance to the next Euclidean pair};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,4.25) {9.};
+  \node[anchor=west,font=\large] at (2.05,4.25)
+    {Continue inactive padding until the fixed $1{,}479$-microstep schedule ends.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,4.25)
+    {$\triangleright\ $ input-independent reversible runtime};
+
+  \node[anchor=west,font=\large\bfseries] at (1.15,3.05) {10.};
+  \node[anchor=west,font=\large] at (2.05,3.05)
+    {$z\gets(-1)^{\pi+1}t'\pmod p$; use $z$, then reverse Steps 2--9.};
+  \node[anchor=east,font=\normalsize,text=black!65] at (32.95,3.05)
+    {$\triangleright\ r=1,\ r'=0,\ xz\equiv1\pmod p$};
+
+  % Arithmetic and packing invariants connect the pseudocode to the next slides.
+  \draw[black!55,line width=0.6pt,rounded corners=1pt,fill=gateblue]
+    (1.15,0.55) rectangle (33.0,2.35);
+  \draw[black!35,line width=0.5pt] (17.1,0.72)--(17.1,2.18);
+  \node[anchor=west,font=\normalsize,align=left,text width=14.9cm] at (1.5,1.45)
+    {\textbf{Euclidean invariants}\quad
+     $rt+r't'=p$,\\[-0.5mm]
+     $r\equiv(-1)^{\pi+1}xt'$,\quad
+     $r'\equiv(-1)^\pi xt\pmod p$.};
+  \node[anchor=west,font=\normalsize,align=left,text width=14.7cm] at (17.45,1.45)
+    {\textbf{Packed-state invariants}\quad
+     $W_1=t\Vert q\Vert r$,\quad
+     $W_2=\operatorname{rot}_{\ell_s}(t'\Vert r')$,\\[-0.5mm]
+     $\ell_t+1+\ell_q+\operatorname{bitlen}(r)\le n+3$,\quad
+     $\operatorname{bitlen}(t')+\ell_{r'}\le n+3$.\\[-0.5mm]
+     {\scriptsize Here $n=256$ is the \texttt{secp256k1} field-element bit width;
+     $\operatorname{rot}_{\ell_s}$ cyclically rotates the packed layout by $\ell_s$ lanes and is not an arithmetic shift.}};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Stage 2 implementation overview
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
@@ -420,7 +575,8 @@
        W_1=(t\mid q\mid r),\qquad W_2=\operatorname{rot}_{\ell_s}(t'\mid r').
      \]
      Length metadata $\ell_t,\ell_q,\ell_{t'},\ell_{r'},\ell_s$ identifies the active subranges;
-     phase, sign, and iteration bits control the reversible microsteps.};
+     phase, sign, and iteration bits control the reversible microsteps. The cyclic rotation aligns
+     the active slices of $t'$ and $r'$ with the current arithmetic window without allocating shifted copies.};
   \node[detail,text width=90mm,minimum height=51mm] at (27.3,6.2)
     {\textbf{Passenger control}\\[1mm]
      Only one full coordinate accompanies the EEA peak. The preserved clean top lane of the
@@ -622,7 +778,8 @@
        W_2=\operatorname{rot}_{\ell_s}(t'\Vert r').
      \]
      Shifted remainder and coefficient updates therefore read aligned physical slices without
-     allocating shifted copies of either operand.};
+     allocating shifted copies of either operand. This is a reversible permutation of storage lanes,
+     not multiplication by $2^{\ell_s}$; inverse rotation restores the original packed layout.};
   \node[warning,text width=91mm,minimum height=50mm] at (27.3,5.75)
     {\textbf{Lifecycle obligation}\\[1mm]
      This is a coherent quantum cursor, not a classical loop index. The optimization is valid only
