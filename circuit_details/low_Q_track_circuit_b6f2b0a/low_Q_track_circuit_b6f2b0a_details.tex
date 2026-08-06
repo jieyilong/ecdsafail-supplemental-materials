@@ -236,6 +236,57 @@
 \newpage
 
 % ============================================================================
+% Additional analysis: exact live-set accounting at the EEA peak
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Why the register-shared core peaks at 825 qubits};
+  \node[font=\large] at (17.15,17.15)
+    {The Q825 route removes one persistent metadata lane; local microkernels then consume the remaining 13-qubit headroom.};
+
+  \node[font=\large\bfseries,anchor=west] at (1.7,15.65) {Persistent state during a scheduled EEA step};
+  \draw[black,line width=0.9pt,rounded corners=1pt] (1.7,12.6) rectangle (32.6,14.9);
+  \fill[invviolet] (1.7,12.6) rectangle (11.55,14.9);
+  \fill[gateblue] (11.55,12.6) rectangle (21.4,14.9);
+  \fill[lookorange] (21.4,12.6) rectangle (31.25,14.9);
+  \fill[outgreen] (31.25,12.6) rectangle (32.6,14.9);
+  \foreach \xx in {11.55,21.4,31.25}{\draw[black,line width=0.7pt] (\xx,12.6)--(\xx,14.9);}
+  \node[font=\large,align=center] at (6.63,13.75) {$W_1$\\$259$ lanes};
+  \node[font=\large,align=center] at (16.48,13.75) {$W_2$\\$259$ lanes};
+  \node[font=\large,align=center] at (26.33,13.75) {passenger $d_y$\\$257$ lanes};
+  \node[font=\large,align=center] at (31.93,13.75) {metadata\\$37$};
+
+  \node[detail,text width=93mm,minimum height=50mm] at (7.1,8.55)
+    {\textbf{The two physical banks: $518$ qubits}\\[1mm]
+     $W_1$ is newly allocated. $W_2$ is not another copy of $d_x$: the $257$-lane
+     divisor register receives two clean pad lanes and is reversed in place to become
+     the second $259$-lane packed bank.};
+  \node[detail,text width=93mm,minimum height=50mm] at (17.15,8.55)
+    {\textbf{Passenger coordinate: $257$ qubits}\\[1mm]
+     The numerator $d_y$ remains live while the EEA acts on $d_x$. Its canonical top
+     lane is known to be zero and is borrowed by selected local kernels, but it still
+     belongs to the passenger register and is restored before terminal multiplication.};
+  \node[detail,text width=93mm,minimum height=50mm] at (27.2,8.55)
+    {\textbf{Persistent metadata: $37$ qubits}\\[-1mm]
+     \[
+       9_{\ell_t}+1_{\ell_{t'}}+7_{\ell_q}+8_{\ell_s}
+       +8_{\ell_{r'}}+4_{\rm control}=37.
+     \]
+     The four controls are the two phase bits, sign, and iteration parity.};
+
+  \node[result,text width=284mm,minimum height=31mm] at (17.15,3.4)
+    {\textbf{Peak equation.}
+     \[
+       \underbrace{259+259+257+37}_{812\ \text{persistent qubits}}
+       +\underbrace{13}_{\text{largest scheduled scratch set}}=825.
+     \]
+     The Q826 parent stored an eight-bit $\ell_q$, giving $813+13=826$. Q825 keeps only seven
+     persistent $\ell_q$ lanes and reconstructs the omitted controlled effect when required.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
 % Page 5
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
@@ -277,6 +328,59 @@
     {\textbf{Scope}\\[1mm]
      These loads exploit the challenge's classical-addend interface. In a coherent QROM-based
      Shor call, $x_A$ and $y_A$ are quantum data and need a different implementation.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Additional analysis: low-pressure modular arithmetic
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 1 detail: fold the 257th lane instead of retaining a reducer};
+  \node[font=\large] at (17.15,17.15)
+    {The point-addition route repeatedly trades canonical range for a narrow pseudo-Mersenne fold and prompt cleanup.};
+
+  \node[classical,text width=75mm,minimum height=34mm] (SUB) at (5.0,12.9)
+    {integer subtraction in $257$ lanes\\
+     $z=(a-b)\bmod 2^{257}$\\
+     top lane $h=z_{256}$};
+  \node[gate,text width=75mm,minimum height=34mm] (FOLD) at (13.5,12.9)
+    {pseudo-Mersenne fold\\
+     $2^{256}\equiv F\pmod p$\\
+     $z_{0:255}\gets z_{0:255}+hF$};
+  \node[inversion,text width=75mm,minimum height=34mm] (MBU) at (22.0,12.9)
+    {measurement-assisted flag cleanup\\
+     measure $h$ in the $X$ basis\\
+     apply the matching phase correction};
+  \node[result,text width=58mm,minimum height=34mm] (OUTR) at (30.0,12.9)
+    {release the top lane\\retain a $256$-bit residue};
+  \draw[flow] (SUB.east)--(FOLD.west);
+  \draw[flow] (FOLD.east)--(MBU.west);
+  \draw[flow] (MBU.east)--(OUTR.west);
+
+  \node[detail,text width=91mm,minimum height=55mm] at (7.0,6.1)
+    {\textbf{Sparse correction}\\[-1mm]
+     \[
+       p=2^{256}-F,\qquad F=2^{32}+977.
+     \]
+     An overflow contribution $h2^{256}$ is congruent to $hF$. The correction therefore touches
+     only the low window spanned by the sparse constant rather than retaining a second full-width
+     modular-reduction register.};
+  \node[detail,text width=91mm,minimum height=55mm] at (17.15,6.1)
+    {\textbf{Range discipline}\\[-1mm]
+     The raw fold produces a representative in $[0,2^{256})$, not necessarily in $[0,p)$.
+     Call sites that require a canonical value perform one final conditional subtraction of $p$;
+     paired inverse routines rely on the exact range contract established by the corresponding
+     forward operation.};
+  \node[warning,text width=91mm,minimum height=55mm] at (27.3,6.1)
+    {\textbf{Approximation boundary}\\[-1mm]
+     Several narrow comparisons and fold windows are selected for the benchmark route. The algebra
+     $2^{256}\equiv F\pmod p$ is exact, while the claim that every omitted carry or comparison bit is
+     irrelevant is supported only on the documented validation corpus unless separately proved.};
+
+  \node[note,text width=30cm,align=center,font=\small\itshape] at (17.15,1.1)
+    {The measurement-assisted cleanup itself is exact when its regenerated predicate matches the measured flag; the finite-support caveat concerns the selected arithmetic widths and range promises.};
 \end{tikzpicture}
 \newpage
 
@@ -381,6 +485,58 @@
 \newpage
 
 % ============================================================================
+% Additional analysis: reflected input, schedule, and terminal state
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 2 detail: reflected input and a fixed reversible schedule};
+  \node[font=\large] at (17.15,17.15)
+    {The circuit normalizes the denominator, runs a constant number of packed updates, and later reverses them gate for gate.};
+
+  \node[classical,text width=67mm,minimum height=35mm] (REF) at (4.6,12.7)
+    {reflect the denominator\\
+     $b=[d_x>p/2]$\\
+     $\widetilde d_x=\min(d_x,p-d_x)$};
+  \node[inversion,text width=73mm,minimum height=35mm] (INI) at (12.4,12.7)
+    {initialize packed state\\
+     $(r,r')=(p,\widetilde d_x)$\\
+     $(t,t',q)=(1,0,0)$};
+  \node[inversion,text width=73mm,minimum height=35mm] (SCH) at (20.5,12.7)
+    {run steps $1,\ldots,1479$\\
+     active-range subtract/add\\
+     quotient and boundary updates};
+  \node[result,text width=73mm,minimum height=35mm] (TER) at (28.6,12.7)
+    {terminal packed state\\
+     $(r,r',q)=(1,0,0)$\\
+     signed $t'=\widetilde d_x^{-1}$};
+  \draw[flow] (REF.east)--(INI.west);
+  \draw[flow] (INI.east)--(SCH.west);
+  \draw[flow] (SCH.east)--(TER.west);
+
+  \node[detail,text width=91mm,minimum height=52mm] at (7.0,6.2)
+    {\textbf{Why reflect first}\\[-1mm]
+     Replacing $d_x$ by $p-d_x$ when $d_x>p/2$ ensures
+     $0<\widetilde d_x<p/2$. The initial remainder length therefore fits in eight metadata
+     lanes after the source's mixed-width encoding. The parity bit $b$ records the sign change
+     needed to recover $d_x^{-1}$.};
+  \node[detail,text width=91mm,minimum height=52mm] at (17.15,6.2)
+    {\textbf{Padding after convergence}\\[-1mm]
+     Inputs converge at different iterations, but a quantum circuit cannot branch into variable
+     gate counts without recording that branch. The route instead executes a fixed $1{,}479$-step
+     schedule; once $r'=0$, terminal-padding transitions preserve the terminal representation.};
+  \node[detail,text width=91mm,minimum height=52mm] at (27.3,6.2)
+    {\textbf{Exact restoration}\\[-1mm]
+     After the terminal coefficient has been used, constant terminal fields are rebuilt and the
+     same $1{,}479$ microsteps are applied in reverse order. This restores the padded $d_x$
+     register, clears both work banks and all metadata, and finally undoes the initial reflection.};
+
+  \node[note,text width=30cm,align=center,font=\small\itshape] at (17.15,1.15)
+    {Unlike dialog-GCD, reversibility is carried by the complete packed Euclidean state and the inverse gate schedule; no branch transcript is retained.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
 % Page 8
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
@@ -423,6 +579,103 @@
     {\textbf{Reversible lending discipline}\\[1mm]
      A borrowed lane may host temporary information only while its logical owner is inactive. Each microkernel
      must restore the lane before the owner or a neighboring peak stage becomes live again.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Additional analysis: dynamic cursors
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 2 detail: dynamic cursors avoid copied position registers};
+  \node[font=\large] at (17.15,17.15)
+    {Length metadata is temporarily mutated into scan state and then restored, saving a persistent cursor allocation.};
+
+  \node[detail,text width=112mm,minimum height=52mm] at (7.7,12.4)
+    {\textbf{Conventional reversible scan}\\[-1mm]
+     \[
+       \ket{\ell_t}\ket{0}_c
+       \longmapsto \ket{\ell_t}\ket{\ell_t}_c.
+     \]
+     A copied cursor $c$ is decremented while the active coefficient slice is traversed, then
+     incremented and uncomputed. The copy is simple but remains live beside the packed data.};
+  \draw[flow] (13.7,12.4)--(20.0,12.4);
+  \node[result,text width=112mm,minimum height=52mm] at (26.6,12.4)
+    {\textbf{Production in-place scan}\\[-1mm]
+     \[
+       \ket{\ell_t}\xrightarrow{\rm scan}\ket{\ell_t-m}
+       \xrightarrow{\rm reverse\ scan}\ket{\ell_t}.
+     \]
+     The length register itself controls the active positions. Reverse traversal restores every
+     decrement before another microstep may read the original length.};
+
+  \node[detail,text width=91mm,minimum height=50mm] at (7.0,5.75)
+    {\textbf{Coefficient traversal}\\[1mm]
+     The in-place $\ell_t$ cursor drives comparison, addition, and subtraction over the occupied
+     portion of $t$. Only the local increment/decrement scratch is required; no second nine-lane
+     copy of $\ell_t$ is retained.};
+  \node[detail,text width=91mm,minimum height=50mm] at (17.15,5.75)
+    {\textbf{Rotation cursor}\\[1mm]
+     The eight-lane $\ell_s$ register selects the cyclic alignment
+     \[
+       W_2=\operatorname{rot}_{\ell_s}(t'\Vert r').
+     \]
+     Shifted remainder and coefficient updates therefore read aligned physical slices without
+     allocating shifted copies of either operand.};
+  \node[warning,text width=91mm,minimum height=50mm] at (27.3,5.75)
+    {\textbf{Lifecycle obligation}\\[1mm]
+     This is a coherent quantum cursor, not a classical loop index. The optimization is valid only
+     because no concurrent operation needs the original metadata during the scan and the inverse
+     traversal restores both the cursor and every borrowed scratch lane.};
+
+  \node[note,text width=30cm,align=center,font=\small\itshape] at (17.15,1.05)
+    {The dynamic-cursor mechanism is specific to the register-shared low-$Q$ route; the Q$\times$T circuit's ordinary generator indices do not occupy logical qubits.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Additional analysis: the Q826 host windows inherited by Q825
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {The three disjoint Q826 host windows inherited by Q825};
+  \node[font=\large] at (17.15,17.15)
+    {Each window replaces one owned scratch lane by borrowing an inactive lane from the packed state.};
+
+  \node[inversion,text width=87mm,minimum height=43mm] at (6.6,12.75)
+    {\textbf{Remainder update}\\[1mm]
+     An inactive lane of the compact $t'$ counter hosts the missing lane of remainder add/subtract
+     scratch. It is restored before the counter is read or the coefficient phase begins.};
+  \node[inversion,text width=87mm,minimum height=43mm] at (17.15,12.75)
+    {\textbf{Coefficient update}\\[1mm]
+     A locally inactive $\ell_s$ lane hosts one coefficient carry/temporary lane. The borrower is
+     released before rotation metadata becomes live again.};
+  \node[inversion,text width=87mm,minimum height=43mm] at (27.7,12.75)
+    {\textbf{Rotated swap}\\[1mm]
+     A different inactive $t'$ lane hosts the missing rotated-swap scratch lane. The swap network
+     restores the lender before returning to the shared EEA state.};
+
+  \draw[black!55,line width=0.8pt] (3.0,8.8)--(31.3,8.8);
+  \node[font=\large\bfseries,anchor=west] at (2.8,9.45) {Scheduled ownership};
+  \draw[black,line width=0.7pt,fill=lookorange,rounded corners=1pt] (3.2,7.6) rectangle ++(7.0,1.5);
+  \node[font=\normalsize] at (6.7,8.35) {remainder window};
+  \draw[black,line width=0.7pt,fill=gateblue,rounded corners=1pt] (11.1,7.6) rectangle ++(7.0,1.5);
+  \node[font=\normalsize] at (14.6,8.35) {coefficient window};
+  \draw[black,line width=0.7pt,fill=invviolet,rounded corners=1pt] (19.0,7.6) rectangle ++(7.0,1.5);
+  \node[font=\normalsize] at (22.5,8.35) {rotated-swap window};
+  \draw[black,line width=0.7pt,fill=outgreen,rounded corners=1pt] (26.9,7.6) rectangle ++(4.0,1.5);
+  \node[font=\normalsize] at (28.9,8.35) {next microstep};
+
+  \node[detail,text width=136mm,minimum height=43mm] at (9.25,4.25)
+    {\textbf{Why the savings compose.} The three borrowers are never simultaneously active and do not
+     borrow the same live value. Source-level harnesses compare each hosted kernel with an owned-scratch
+     baseline in both directions, check scratch restoration, and verify that the host is clean at entry and exit.};
+  \node[result,text width=136mm,minimum height=43mm] at (25.05,4.25)
+    {\textbf{Relation to Q825.} These windows establish the Q826 peak with an eight-lane $\ell_q$.
+     Q825 keeps all three host schedules unchanged and removes one additional persistent lane from
+     $\ell_q$; the next slide explains how that omitted control is reconstructed.};
 \end{tikzpicture}
 \newpage
 
@@ -478,6 +731,61 @@
   \node[warning,text width=284mm,minimum height=20mm] at (17.15,1.55)
     {The committed support audit reports $\max\ell_q=22$ over $18{,}048$ inversion factors. This supports
      the seven-bit route on the benchmark corpus; it is not, by itself, a universal proof that every field input satisfies $\ell_q<128$.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Additional analysis: consuming the omitted Q825 metadata bit
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {How Q825 consumes an omitted quotient-length bit};
+  \node[font=\large] at (17.15,17.15)
+    {The eighth bit is represented by a reversible predicate only during the few kernels that need it.};
+
+  \node[detail,text width=92mm,minimum height=58mm] at (7.0,12.2)
+    {\textbf{1. Derive the logical bit from the source}\\[-1mm]
+     Let $L=\operatorname{bitlen}(w)$ for the current $259$-bit source and define
+     \[
+       Z_k(w)=\bigwedge_{i=k-1}^{258}\neg w_i.
+     \]
+     Then $Z_{256}=[L\le255]$, $Z_{128}=[L\le127]$, and therefore
+     \[
+       h_7=[128\le L\le255]=Z_{256}\oplus Z_{128}.
+     \]};
+  \node[detail,text width=92mm,minimum height=58mm] at (17.15,12.2)
+    {\textbf{2. Apply its effect without storing it}\\[-1mm]
+     Kernels that would ordinarily read the resident lane $\ell_{q,7}$ instead compute the
+     zero-prefix predicate, use it as a control, and immediately reverse the predicate network.
+     For a target operation $U$, the logical action is
+     \[
+       \ket{w}\ket{\psi}\longmapsto
+       \ket{w}U^{h_7(w)}\ket{\psi},
+     \]
+     with no persistent qubit allocated for $h_7$.};
+  \node[detail,text width=92mm,minimum height=58mm] at (27.3,12.2)
+    {\textbf{3. Borrow only at an ownership gap}\\[-1mm]
+     A direct metadata-swap subroutine temporarily places the logical high bit in a clean local
+     lane denoted $\mathit{zero}_s$. The lane is borrowed only after its previous value is known
+     to be zero and is restored to zero before the surrounding predicate or shift schedule can
+     read it again.};
+
+  \node[inversion,text width=126mm,minimum height=47mm] at (9.0,5.3)
+    {\textbf{Scratch reduction in the split-five kernel}\\[-1mm]
+     The parent route materialized four length bits and required nine local scratch lanes. Q825
+     materializes only the $2^4$, $2^5$, and $2^6$ bits; the implicit $2^7$ effect is folded into
+     the final subtraction and multi-controlled predicates, reducing the local requirement to
+     eight lanes at the relevant substep.};
+  \node[warning,text width=126mm,minimum height=47mm] at (25.3,5.3)
+    {\textbf{What is established}\\[-1mm]
+     The source audit observes $\max L=22$ over $18{,}048$ inversion factors in the committed
+     benchmark support, so the omitted bit is zero on those executions. The reversible predicate
+     explains how the circuit remains coherent when that bit is consumed; the finite audit does
+     not prove the same bound for every possible field input.};
+
+  \node[note,text width=30cm,align=center,font=\small\itshape] at (17.15,1.05)
+    {This is a recomputation-for-storage trade: one persistent peak lane is removed at the price of additional predicate and multi-controlled operations.};
 \end{tikzpicture}
 \newpage
 
@@ -570,6 +878,61 @@
 \newpage
 
 % ============================================================================
+% Additional analysis: exact measurement-based register release
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Measurement-based release and later recomputation};
+  \node[font=\large] at (17.15,17.15)
+    {The route frees a full field register during the reverse EEA without discarding its coherent information.};
+
+  \node[inversion,text width=95mm,minimum height=58mm] at (7.1,12.15)
+    {\textbf{Hadamard-measure a computed register}\\[-1mm]
+     Suppose a reversible computation has produced
+     \[
+       \sum_x \alpha_x\ket{x}\ket{f(x)}_D.
+     \]
+     Measuring each lane of $D$ in the $X$ basis gives a classical string $m$ and leaves
+     \[
+       \sum_x \alpha_x(-1)^{m\cdot f(x)}\ket{x}.
+     \]
+     The quantum lanes of $D$ may now be released.};
+  \node[detail,text width=95mm,minimum height=58mm] at (17.15,12.15)
+    {\textbf{Rebuild the same Boolean value}\\[-1mm]
+     After the reverse EEA restores $d_x$, the circuit recomputes
+     \[
+       f(x)=d_y=\lambda d_x
+     \]
+     in a fresh field register. The measurement record is retained classically; no quantum copy
+     of $d_y$ remains live beside the packed EEA state.};
+  \node[result,text width=95mm,minimum height=58mm] at (27.2,12.15)
+    {\textbf{Resolve the phase and restore the register}\\[-1mm]
+     Applying $Z^{m_j}$ to each rebuilt lane contributes the phase
+     $(-1)^{m\cdot f(x)}$ a second time, canceling the measurement phase. Hence
+     \[
+       (-1)^{2m\cdot f(x)}=1,
+     \]
+     and the coherent state with an explicit $\ket{d_y}$ register is recovered exactly.};
+
+  \draw[flow] (11.85,7.45)--(14.0,7.45);
+  \draw[flow] (20.3,7.45)--(22.45,7.45);
+  \node[classical,text width=85mm,minimum height=30mm] at (7.6,7.45)
+    {ghost and free $d_y$\\after forming $\lambda=d_y d_x^{-1}$};
+  \node[inversion,text width=85mm,minimum height=30mm] at (17.15,7.45)
+    {run the fixed EEA schedule backward\\restore $d_x$ and clear packed state};
+  \node[gate,text width=85mm,minimum height=30mm] at (26.7,7.45)
+    {recompute $d_y=\lambda d_x$\\apply phase feedback from $m$};
+
+  \node[warning,text width=284mm,minimum height=34mm] at (17.15,3.15)
+    {\textbf{Why this is valid.} The optimization is exact when the later register contains the same
+     Boolean function lane by lane as the one that was measured. It is not ordinary erasure and does
+     not assume that $d_y$ is classical. In the cancel stage, the same mechanism ghosts $\lambda$ and
+     resolves it against the independently reconstructed quotient $d'_y(d'_x)^{-1}$.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
 % Page 12
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
@@ -609,6 +972,56 @@
      The cancel phase ghosts $\lambda$, computes the inverse of $d'_x$, recreates the quotient
      $d'_y(d'_x)^{-1}$, resolves the ghost, undoes the temporary multiply, and reverses the EEA. This is not a
      replay of the first GCD path; it is a fresh reversible division on the alternate witness.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Additional analysis: fresh alternate-witness EEA lifecycle
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 5: cancel $\lambda$ with a fresh alternate witness};
+  \node[font=\large] at (17.15,17.15)
+    {The second 825-qubit peak proves and exploits $d'_y(d'_x)^{-1}=\lambda$ for the generic addition case.};
+
+  \node[gate,text width=54mm,minimum height=28mm] (A1) at (3.7,12.8)
+    {form the witness\\$d'_x=x_A-x_{R'}$\\$d'_y=\lambda d'_x$};
+  \node[classical,text width=54mm,minimum height=28mm] (A2) at (10.4,12.8)
+    {ghost and release\\the $257$-lane\\$\lambda$ register};
+  \node[inversion,text width=54mm,minimum height=28mm] (A3) at (17.15,12.8)
+    {initialize on $(p,d'_x)$\\run $1{,}479$\\EEA microsteps};
+  \node[gate,text width=54mm,minimum height=28mm] (A4) at (23.9,12.8)
+    {terminal multiply\\$q=d'_y(d'_x)^{-1}$};
+  \node[result,text width=54mm,minimum height=28mm] (A5) at (30.6,12.8)
+    {resolve the ghost\\against $q=\lambda$\\and release $q$};
+  \draw[flow] (A1.east)--(A2.west);
+  \draw[flow] (A2.east)--(A3.west);
+  \draw[flow] (A3.east)--(A4.west);
+  \draw[flow] (A4.east)--(A5.west);
+
+  \node[detail,text width=91mm,minimum height=53mm] at (7.0,6.6)
+    {\textbf{Elliptic-curve identity}\\[-1mm]
+     For $R'=R+A$ in the generic affine case,
+     \[
+       d'_x=x_A-x_{R'},\qquad
+       d'_y=y_A-y_{R'}=\lambda d'_x.
+     \]
+     Therefore $d'_y(d'_x)^{-1}=\lambda$ whenever $d'_x\ne0$.};
+  \node[detail,text width=91mm,minimum height=53mm] at (17.15,6.6)
+    {\textbf{No stored path from Stage 2}\\[-1mm]
+     The implementation does not retain or replay the first EEA trajectory. It constructs a new packed
+     EEA state from $d'_x$, follows the data-dependent schedule for that witness, and produces a fresh
+     quotient whose lanes match the ghosted slope.};
+  \node[inversion,text width=91mm,minimum height=53mm] at (27.3,6.6)
+    {\textbf{Reversible teardown}\\[-1mm]
+     After resolving the $\lambda$ ghost, the terminal multiplication is undone, terminal constants are
+     rebuilt, and the fixed EEA schedule is reversed. This restores $d'_x$, clears both packed $259$-lane
+     banks and all metadata, and leaves only the output-coordinate route.};
+
+  \node[warning,text width=284mm,minimum height=21mm] at (17.15,1.55)
+    {The cancellation identity is algebraically exact for the generic addition branch. The submitted circuit's
+     finite-width and truncated arithmetic choices retain the benchmark-support evidential scope stated elsewhere in this deck.};
 \end{tikzpicture}
 \newpage
 
