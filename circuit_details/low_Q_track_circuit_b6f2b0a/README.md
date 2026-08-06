@@ -20,5 +20,5 @@ The deck distinguishes the accumulated low-qubit architecture from the submissio
 ## Verification notes
 
 - The release builder completed with count-only phase instrumentation and reproduced `Q=825` and `T=489161900` exactly.
-- The 25-page PDF compiles without overfull-box or undefined-reference warnings and was rendered page by page for visual inspection.
+- The 26-page PDF compiles without overfull-box or undefined-reference warnings and was rendered page by page for visual inspection.
 - The historical source snapshot's complete Rust test target does not currently compile because unrelated test-only modules reference missing experimental helpers and obsolete simulator methods. This does not affect the successful release build or the structural count used in the deck.

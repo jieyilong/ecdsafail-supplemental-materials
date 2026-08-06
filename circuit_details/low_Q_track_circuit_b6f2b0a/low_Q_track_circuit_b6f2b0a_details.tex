@@ -298,7 +298,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Why the register-shared core peaks at 825 qubits};
+    {Why the register-shared core peaks at 825 qubits in Stage 2 and 5};
   \node[font=\large] at (17.15,17.15)
     {The Q825 route removes one persistent metadata lane; local microkernels then consume the remaining 13-qubit headroom.};
 
@@ -306,13 +306,13 @@
   \draw[black,line width=0.9pt,rounded corners=1pt] (1.7,12.6) rectangle (32.6,14.9);
   \fill[invviolet] (1.7,12.6) rectangle (11.55,14.9);
   \fill[gateblue] (11.55,12.6) rectangle (21.4,14.9);
-  \fill[lookorange] (21.4,12.6) rectangle (31.25,14.9);
-  \fill[outgreen] (31.25,12.6) rectangle (32.6,14.9);
-  \foreach \xx in {11.55,21.4,31.25}{\draw[black,line width=0.7pt] (\xx,12.6)--(\xx,14.9);}
+  \fill[lookorange] (21.4,12.6) rectangle (29.65,14.9);
+  \fill[outgreen] (29.65,12.6) rectangle (32.6,14.9);
+  \foreach \xx in {11.55,21.4,29.65}{\draw[black,line width=0.7pt] (\xx,12.6)--(\xx,14.9);}
   \node[font=\large,align=center] at (6.63,13.75) {$W_1$\\$259$ lanes};
   \node[font=\large,align=center] at (16.48,13.75) {$W_2$\\$259$ lanes};
-  \node[font=\large,align=center] at (26.33,13.75) {passenger $d_y$\\$257$ lanes};
-  \node[font=\large,align=center] at (31.93,13.75) {metadata\\$37$};
+  \node[font=\large,align=center] at (25.53,13.75) {passenger $d_y$\\$257$ lanes};
+  \node[font=\normalsize,align=center] at (31.13,13.75) {metadata\\$37$};
 
   \node[detail,text width=93mm,minimum height=50mm] at (7.1,8.55)
     {\textbf{The two physical banks: $518$ qubits}\\[1mm]
@@ -394,7 +394,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Stage 1 detail: fold the 257th lane instead of retaining a reducer};
+    {Stage 1: fold the 257th lane instead of retaining a reducer};
   \node[font=\large] at (17.15,17.15)
     {The point-addition route repeatedly trades canonical range for a narrow pseudo-Mersenne fold and prompt cleanup.};
 
@@ -594,7 +594,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Stage 2 detail: the packed Euclidean state machine};
+    {Stage 2: the packed Euclidean state machine};
   \node[font=\large] at (17.15,17.15)
     {The circuit incrementally forms quotient bits and updates a remainder/coefficient pair.};
 
@@ -646,7 +646,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Stage 2 detail: reflected input and a fixed reversible schedule};
+    {Stage 2: reflected input and a fixed reversible schedule};
   \node[font=\large] at (17.15,17.15)
     {The circuit normalizes the denominator, runs a constant number of packed updates, and later reverses them gate for gate.};
 
@@ -698,30 +698,39 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Stage 2 detail: register sharing and dynamic width};
+    {Stage 2: register sharing and dynamic width};
   \node[font=\large] at (17.15,17.15)
     {The principal low-$Q$ gain comes from assigning physical lanes by lifetime rather than by logical register name.};
 
-  \node[font=\large\bfseries,anchor=west] at (2.0,15.55) {Naive logical layout};
+  \node[font=\large\bfseries,anchor=west] at (2.0,15.55)
+    {Naive logical layout: five separate worst-case allocations};
   \foreach \x/\name/\shade in {3.3/A/gateblue,9.1/B/gateblue,14.9/C_A/lookorange,20.7/C_B/lookorange,26.5/q/invviolet}{
     \node[gate,fill=\shade,minimum width=48mm,minimum height=15mm] at (\x+1.7,14.3) {$\name$};
   }
-  \node[note,anchor=west] at (29.4,14.3) {separate worst-case allocations};
-
   \node[font=\large\bfseries,anchor=west] at (2.0,11.75) {Production packed layout};
   \draw[black,line width=1pt,rounded corners=1pt,fill=gateblue] (2.0,9.3) rectangle (15.8,10.9);
-  \draw[black,line width=1pt,fill=lookorange] (2.0,9.3) rectangle (6.8,10.9);
-  \draw[black,line width=1pt,fill=invviolet] (6.8,9.3) rectangle (8.6,10.9);
-  \node[font=\large] at (4.4,10.1) {$t$ grows};
-  \node[font=\large] at (7.7,10.1) {$q$};
-  \node[font=\large] at (12.2,10.1) {$r$ shrinks};
+  \draw[black,line width=1pt,fill=lookorange] (2.0,9.3) rectangle (6.6,10.9);
+  \draw[black,line width=1pt,fill=invviolet] (6.6,9.3) rectangle (9.0,10.9);
+  \node[font=\normalsize,align=center] at (4.3,10.1)
+    {$t$ grows\\[-0.5mm]$1\longrightarrow p$};
+  \node[font=\footnotesize,align=center] at (7.8,10.1)
+    {$q$ temporary\\[-0.5mm]$0\to q_i\to0$};
+  \node[font=\normalsize,align=center] at (12.4,10.1)
+    {$r$ shrinks\\[-0.5mm]$p\longrightarrow1$};
   \node[font=\normalsize,anchor=south] at (8.9,11.0) {$W_1$ (259 lanes)};
 
   \draw[black,line width=1pt,rounded corners=1pt,fill=gateblue] (18.5,9.3) rectangle (32.3,10.9);
   \draw[black,line width=1pt,fill=lookorange] (18.5,9.3) rectangle (25.0,10.9);
-  \node[font=\large] at (21.75,10.1) {$t'$ grows};
-  \node[font=\large] at (28.65,10.1) {$r'$ shrinks};
+  \node[font=\normalsize,align=center] at (21.75,10.1)
+    {$t'$ grows\\[-0.5mm]$0\longrightarrow t'_{\mathrm{term}}$};
+  \node[font=\normalsize,align=center] at (28.65,10.1)
+    {$r'$ shrinks\\[-0.5mm]$x_0\longrightarrow0$};
   \node[font=\normalsize,anchor=south] at (25.4,11.0) {$W_2$ (259 lanes, rotated by $\ell_s$)};
+
+  \node[note,text width=29.5cm,align=center,font=\normalsize] at (17.15,8.55)
+    {$x_0=\min(x,p-x)$. At termination,
+     $z=(-1)^{\pi+1}t'_{\mathrm{term}}\bmod p=x^{-1}\bmod p$;
+     each quotient $q_i$ is assembled, consumed, and cleared within one restoring-division round.};
 
   \node[detail,text width=92mm,minimum height=45mm] at (7.1,5.35)
     {\textbf{Sliding ownership boundaries}\\[1mm]
@@ -744,7 +753,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Stage 2 detail: dynamic cursors avoid copied position registers};
+    {Stage 2: dynamic cursors avoid copied position registers};
   \node[font=\large] at (17.15,17.15)
     {Length metadata is temporarily mutated into scan state and then restored, saving a persistent cursor allocation.};
 
@@ -797,7 +806,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {The three disjoint Q826 host windows inherited by Q825};
+    {Stage 2: three disjoint Q826 host windows inherited by Q825};
   \node[font=\large] at (17.15,17.15)
     {Each window replaces one owned scratch lane by borrowing an inactive lane from the packed state.};
 
@@ -842,7 +851,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {The Q826 $\rightarrow$ Q825 change: omit one persistent $\ell_q$ bit};
+    {Stage 2: omit one persistent $\ell_q$ bit in the Q826 $\rightarrow$ Q825 transition};
   \node[font=\large] at (17.15,17.15)
     {This submission saves one peak lane by reconstructing the high bit only where it is consumed.};
 
@@ -897,7 +906,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {How Q825 consumes an omitted quotient-length bit};
+    {Stage 2: consuming an omitted quotient-length bit};
   \node[font=\large] at (17.15,17.15)
     {The eighth bit is represented by a reversible predicate only during the few kernels that need it.};
 
@@ -947,54 +956,12 @@
 \newpage
 
 % ============================================================================
-% Page 10
-% ============================================================================
-\begin{tikzpicture}[x=1cm,y=1cm]
-  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
-  \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Inherited low-$Q$ optimization stack};
-  \node[font=\large] at (17.15,17.15)
-    {Q825 composes many earlier width reductions; the omitted $\ell_q$ lane is only the final step.};
-
-  \node[detail,text width=91mm,minimum height=48mm] at (7.0,13.25)
-    {\textbf{Three Q826 host windows}\\[1mm]
-     Separate substages lend inactive $t'$ or $\ell_s$ lanes to remainder, coefficient, and rotated-swap
-     microkernels. Their lifetimes are disjoint, so all three one-qubit savings can coexist.};
-  \node[detail,text width=91mm,minimum height=48mm] at (17.15,13.25)
-    {\textbf{Metadata relocation}\\[1mm]
-     Direct swap metadata, a relocated coefficient counter, a fixed parity bit for $\ell_s$, and reuse of
-     $\ell_q$ as old-remainder metadata reduce the persistent control-register footprint.};
-  \node[detail,text width=91mm,minimum height=48mm] at (27.3,13.25)
-    {\textbf{Predicate and comparison narrowing}\\[1mm]
-     Prefix bit-length circuits operate only on active ranges. Truncated guards, direct selectors, and
-     borrowed underflow lanes avoid full-width comparators when the route supplies a tighter bound.};
-
-  \node[detail,text width=91mm,minimum height=48mm] at (7.0,7.55)
-    {\textbf{Paired source complements}\\[1mm]
-     Adjacent bit-length kernels retain a complemented source across a source-disjoint use block, allowing
-     the middle pair of $X$ layers to commute and cancel instead of being emitted twice.};
-  \node[detail,text width=91mm,minimum height=48mm] at (17.15,7.55)
-    {\textbf{Carry and scratch reuse}\\[1mm]
-     Zero carries, comparator chains, raw-prefix lanes, the preserved passenger top bit, and clean coefficient
-     scratch are reused across nonoverlapping local kernels and restored at each ownership boundary.};
-  \node[detail,text width=91mm,minimum height=48mm] at (27.3,7.55)
-    {\textbf{Measurement-assisted cleanup}\\[1mm]
-     Temporary logical-AND and carry ancillas are measured in the $X$ basis and corrected by classical phase
-     feedback, avoiding selected reverse-Toffoli cleanup while releasing qubits promptly.};
-
-  \node[result,text width=284mm,minimum height=23mm] at (17.15,2.25)
-    {\textbf{Design principle:} the route minimizes the union of simultaneously live information, not the sum
-     of nominal register widths. Most individual changes matter only when they relieve a co-binding peak.};
-\end{tikzpicture}
-\newpage
-
-% ============================================================================
 % Page 11
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Producing $\lambda$ while preserving $d_x$ and $d_y$};
+    {Stage 2: producing $\lambda$ while preserving $d_x$ and $d_y$};
   \node[font=\large] at (17.15,17.15)
     {Terminal constants are released before multiplication, and the passenger is reconstructed after reverse EEA.};
 
@@ -1040,7 +1007,7 @@
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Measurement-based release and later recomputation};
+    {Stage 2: measurement-based release and later recomputation};
   \node[font=\large] at (17.15,17.15)
     {The route frees a full field register during the reverse EEA without discarding its coherent information.};
 
@@ -1090,29 +1057,65 @@
 \newpage
 
 % ============================================================================
+% Stage 2 summary
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 2: inherited low-$Q$ optimization stack};
+  \node[font=\large] at (17.15,17.15)
+    {Q825 composes many earlier width reductions; the omitted $\ell_q$ lane is only the final step.};
+
+  \node[detail,text width=91mm,minimum height=48mm] at (7.0,13.25)
+    {\textbf{Three Q826 host windows}\\[1mm]
+     Separate substages lend inactive $t'$ or $\ell_s$ lanes to remainder, coefficient, and rotated-swap
+     microkernels. Their lifetimes are disjoint, so all three one-qubit savings can coexist.};
+  \node[detail,text width=91mm,minimum height=48mm] at (17.15,13.25)
+    {\textbf{Metadata relocation}\\[1mm]
+     Direct swap metadata, a relocated coefficient counter, a fixed parity bit for $\ell_s$, and reuse of
+     $\ell_q$ as old-remainder metadata reduce the persistent control-register footprint.};
+  \node[detail,text width=91mm,minimum height=48mm] at (27.3,13.25)
+    {\textbf{Predicate and comparison narrowing}\\[1mm]
+     Prefix bit-length circuits operate only on active ranges. Truncated guards, direct selectors, and
+     borrowed underflow lanes avoid full-width comparators when the route supplies a tighter bound.};
+
+  \node[detail,text width=91mm,minimum height=48mm] at (7.0,7.55)
+    {\textbf{Paired source complements}\\[1mm]
+     Adjacent bit-length kernels retain a complemented source across a source-disjoint use block, allowing
+     the middle pair of $X$ layers to commute and cancel instead of being emitted twice.};
+  \node[detail,text width=91mm,minimum height=48mm] at (17.15,7.55)
+    {\textbf{Carry and scratch reuse}\\[1mm]
+     Zero carries, comparator chains, raw-prefix lanes, the preserved passenger top bit, and clean coefficient
+     scratch are reused across nonoverlapping local kernels and restored at each ownership boundary.};
+  \node[detail,text width=91mm,minimum height=48mm] at (27.3,7.55)
+    {\textbf{Measurement-assisted cleanup}\\[1mm]
+     Temporary logical-AND and carry ancillas are measured in the $X$ basis and corrected by classical phase
+     feedback, avoiding selected reverse-Toffoli cleanup while releasing qubits promptly.};
+
+  \node[result,text width=284mm,minimum height=23mm] at (17.15,2.25)
+    {\textbf{Design principle:} the route minimizes the union of simultaneously live information, not the sum
+     of nominal register widths. Most individual changes matter only when they relieve a co-binding peak.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
 % Page 12
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
   \node[font=\LARGE\bfseries] at (17.15,18.0)
-    {Coordinate update and alternate-witness cleanup};
+    {Stages 3--4: coordinate update and alternate-witness construction};
   \node[font=\large] at (17.15,17.15)
     {The same $X$ and $Y$ registers are recycled from input coordinates to output coordinates.};
 
-  \node[gate,text width=50mm,minimum height=26mm] (Z) at (4.0,12.2)
+  \node[gate,text width=78mm,minimum height=28mm] (Z) at (6.2,12.2)
     {erase $d_y$\\$Y\gets d_y-\lambda d_x=0$};
-  \node[gate,text width=61mm,minimum height=26mm] (NX) at (10.5,12.2)
+  \node[gate,text width=78mm,minimum height=28mm] (NX) at (17.15,12.2)
     {form new $x$ coordinate\\$X\gets\lambda^2-x_R-x_A=x_{R'}$};
-  \node[gate,text width=62mm,minimum height=26mm] (ND) at (17.6,12.2)
-    {reuse differences\\$X\gets x_A-x_{R'}=d'_x$\\$Y\gets\lambda d'_x=d'_y$};
-  \node[inversion,text width=59mm,minimum height=26mm] (CAN) at (24.7,12.2)
-    {cancel slope ancilla\\recompute $d'_y/d'_x=\lambda$\\resolve and erase $\lambda$};
-  \node[result,text width=48mm,minimum height=26mm] (OUT) at (30.7,12.2)
-    {restore output\\$X=x_{R'}$\\$Y=y_{R'}$};
+  \node[gate,text width=78mm,minimum height=28mm] (ND) at (28.1,12.2)
+    {construct the alternate witness\\$X\gets x_A-x_{R'}=d'_x$\\$Y\gets\lambda d'_x=d'_y=y_{R'}+y_A$};
   \draw[flow] (Z.east)--(NX.west);
   \draw[flow] (NX.east)--(ND.west);
-  \draw[flow] (ND.east)--(CAN.west);
-  \draw[flow] (CAN.east)--(OUT.west);
 
   \node[detail,text width=88mm,minimum height=53mm] at (7.0,6.1)
     {\textbf{Horner multiply-and-accumulate}\\[-1mm]
@@ -1125,10 +1128,12 @@
      loading and multiplication scratch while $X$ moves through $x_R$, $x_{R'}$, and $d'_x$. This avoids a
      separate full-width difference register.};
   \node[detail,text width=88mm,minimum height=53mm] at (27.3,6.1)
-    {\textbf{Second EEA lifecycle}\\[-1mm]
-     The cancel phase ghosts $\lambda$, computes the inverse of $d'_x$, recreates the quotient
-     $d'_y(d'_x)^{-1}$, resolves the ghost, undoes the temporary multiply, and reverses the EEA. This is not a
-     replay of the first GCD path; it is a fresh reversible division on the alternate witness.};
+    {\textbf{Alternate witness for Stage 5}\\[-1mm]
+     The coordinate identity $y_{R'}=\lambda(x_A-x_{R'})-y_A$ gives
+     \[
+       d'_y=\lambda d'_x=y_{R'}+y_A.
+     \]
+     Thus $d'_y(d'_x)^{-1}=\lambda$, providing the independent witness used to erase the slope in Stage 5.};
 \end{tikzpicture}
 \newpage
 
@@ -1162,7 +1167,7 @@
      For $R'=R+A$ in the generic affine case,
      \[
        d'_x=x_A-x_{R'},\qquad
-       d'_y=y_A-y_{R'}=\lambda d'_x.
+       d'_y=y_{R'}+y_A=\lambda d'_x.
      \]
      Therefore $d'_y(d'_x)^{-1}=\lambda$ whenever $d'_x\ne0$.};
   \node[detail,text width=91mm,minimum height=53mm] at (17.15,6.6)
@@ -1183,7 +1188,62 @@
 \newpage
 
 % ============================================================================
-% Page 13
+% Stage 6 output recovery
+% ============================================================================
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \path[use as bounding box] (0,0) rectangle (34.3,18.6);
+  \node[font=\LARGE\bfseries] at (17.15,18.0)
+    {Stage 6: recover the output and clear remaining workspace};
+  \node[font=\large] at (17.15,17.15)
+    {The final off-peak stage converts the alternate witness into the affine coordinates of $R'=R+A$.};
+
+  \node[inversion,text width=59mm,minimum height=30mm] (S0) at (4.0,12.5)
+    {input after Stage 5\\
+     $X=d'_x=x_A-x_{R'}$\\
+     $Y=d'_y=y_{R'}+y_A$\\
+     EEA state and $\lambda$ cleared};
+  \node[classical,text width=63mm,minimum height=30mm] (SX) at (12.6,12.5)
+    {recover the $x$ coordinate\\
+     $X\gets x_A-X=x_{R'}$\\
+     transiently load $x_A$};
+  \node[classical,text width=63mm,minimum height=30mm] (SY) at (21.2,12.5)
+    {recover the $y$ coordinate\\
+     $Y\gets Y-y_A=y_{R'}$\\
+     transiently load $y_A$};
+  \node[result,text width=56mm,minimum height=30mm] (SO) at (29.3,12.5)
+    {output in place\\
+     $\ket{x_{R'}}_X\ket{y_{R'}}_Y$\\
+     temporary lanes clean};
+  \draw[flow] (S0.east)--(SX.west);
+  \draw[flow] (SX.east)--(SY.west);
+  \draw[flow] (SY.east)--(SO.west);
+
+  \node[detail,text width=88mm,minimum height=52mm] at (6.2,6.15)
+    {\textbf{Algebraic recovery}\\[-1mm]
+     The alternate witness satisfies
+     \[
+       d'_x=x_A-x_{R'},\qquad
+       d'_y=\lambda d'_x=y_{R'}+y_A.
+     \]
+     The two subtractions therefore recover $x_{R'}$ and $y_{R'}$ without allocating separate output registers.};
+  \node[detail,text width=88mm,minimum height=52mm] at (17.15,6.15)
+    {\textbf{Transient classical-coordinate access}\\[-1mm]
+     The classically known coordinates of $A$ are loaded only for their corresponding subtraction and are
+     removed immediately afterward. The same $X$ and $Y$ lanes that held the Euclidean witnesses become the
+     final output registers.};
+  \node[result,text width=88mm,minimum height=52mm] at (28.1,6.15)
+    {\textbf{Off-peak reversible teardown}\\[-1mm]
+     Stage 6 reaches $Q=789$, below the two $Q=825$ EEA peaks. The transient load, carry, and padding lanes are
+     returned clean, leaving only the API-width affine coordinates of $R'$.};
+
+  \node[note,text width=284mm,minimum height=18mm] at (17.15,1.45)
+    {Source correspondence: \texttt{ec3.alt.new\_x\_restore} and
+     \texttt{ec3.alt.new\_y\_restore}.};
+\end{tikzpicture}
+\newpage
+
+% ============================================================================
+% Measured resource profile
 % ============================================================================
 \begin{tikzpicture}[x=1cm,y=1cm]
   \path[use as bounding box] (0,0) rectangle (34.3,18.6);
