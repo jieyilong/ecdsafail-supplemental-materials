@@ -45,7 +45,7 @@
 \maketitle
 
 \begin{abstract}
-Submission \texttt{8e9c9a2} implements mixed elliptic-curve point addition with a classically specified addend. A windowed Shor circuit instead supplies the addend coherently: a quantum address selects a row of a classical point table, the selected point is added to a quantum accumulator, and all address-dependent workspace must be removed. We modify the circuit to expose the quantum registers $X,Y,J$ and $2\cdot2^w$ classical coordinate registers, condition QROM payload operations on those runtime table bits, derive $3x_J$ inside the circuit, handle the identity row coherently, and exactly replay each lookup after use. For $w=16$, the resulting circuit uses $Q=1{,}162$ logical qubits and $T=1{,}684{,}156.770$ average executed Toffoli gates over 9,024 cases. It has no ancilla failures and an any-channel error rate of $0.2216\%$, arising from finite-support arithmetic approximations. Correlated four-call tests for every $w\in\{0,\ldots,5\}$ exercise 6,144 additions and confirm cleanup after every call. The construction implements a reusable window-selected point-addition kernel on the same generic-affine domain as the source circuit; it is not a complete implementation of Shor's algorithm.
+Submission \texttt{8e9c9a2} implements mixed elliptic-curve point addition with a classically specified addend. A windowed Shor circuit instead supplies the addend coherently: a quantum address selects a row of a classical point table, the selected point is added to a quantum accumulator, and all address-dependent workspace must be removed. We modify the circuit to expose the quantum registers $X,Y,J$ and $2\cdot2^w$ classical coordinate registers, condition QROM payload operations on those runtime table bits, derive $3x_J$ inside the circuit, handle the identity row coherently, and exactly replay each lookup after use. For $w=16$, the resulting circuit uses $Q=1{,}162$ logical qubits. On an independently seeded corpus shared with the original circuit, its average executed Toffoli count is $T=1{,}684{,}160.924$ over 100,000 inputs. The any-channel error rates are $0.1910\%$ for the windowed circuit and $0.1920\%$ for the baseline, with no ancilla failures in either circuit and an exact paired sign-test value of $p_{\mathrm{sign}}=1.0$. Correlated four-call tests for every $w\in\{0,\ldots,5\}$ additionally exercise 6,144 additions and confirm cleanup after every call. The construction implements a reusable window-selected point-addition kernel on the same generic-affine domain as the source circuit; it is not a complete implementation of Shor's algorithm.
 \end{abstract}
 
 \section{Target Interface and Runtime ABI}
@@ -215,7 +215,7 @@ Runtime $3x_J$ & \code{ec\_add.rs}: \code{qrom\_coord\_add3x} & Loads only $x_J$
 Identity handling & \code{ec\_add.rs}: \code{toggle\_nonzero\_address}; \code{square.rs}: controlled square-subtract & Constructs $[J\neq0]$, controls the two operations that distinguish the identity branch, and uncomputes the predicate. \\
 Exact unload & \code{qrom.rs}: \code{unload\_word}, \code{unload\_two\_words}, \code{emit\_qroam2\_replay\_unload} & Reverses swaps and replays the XOR lookup to clear payload and routing qubits exactly. \\
 Peak-width control & \code{arith.rs}: low-peak modular add/subtract variants & Avoids simultaneous payload and wide carry-vent allocations and uses a 64-bit upper comparison at the three QROM-use sites. \\
-Validation only & \code{eval\_circuit.rs}: window case generation, runtime table initialization, parallel checkpointing, and correlated sequence runner & Supplies arbitrary table values and verifies coordinates, address, incremental phase, and non-interface ancillas. These changes do not alter the emitted circuit. \\
+Validation only & \code{eval\_circuit.rs}: shared-corpus generation, runtime-table initialization, paired baseline/window evaluation, durable checkpointing, and correlated sequence runner & Supplies arbitrary table values and verifies coordinates, address, incremental phase, and non-interface ancillas. These changes do not alter the emitted circuit. \\
 \bottomrule
 \end{tabularx}
 \caption{Correspondence between circuit-level changes and implementation entry points.}
@@ -275,6 +275,35 @@ The identity case returned the input coordinates, preserved $J=0$, and had no cl
 
 The evaluator records one durable row per input and one commit record per 64-shot batch. On restart, it truncates any uncommitted input tail, reconstructs aggregate counts, and evaluates only unfinished batches. This checkpoint mechanism produced the complete 9,024-case ledger used above.
 
+\subsection{Paired 100,000-input random-corpus comparison}
+
+To compare the arithmetic error of the two interfaces without allowing either operation stream to select its own test set, we generated 100,000 cases from the explicit seed \code{ecdsafail-windowed-independent-random-100k-v1}. This seed is independent of both circuit hashes and therefore does not use the benchmark's Fiat--Shamir sampling rule. Each case contains a random nonidentity accumulator $R=[a]G$, a uniformly sampled 16-bit address $j$, the addend $A_j=[j]G$, and the expected result $R+A_j$. Cases with $R=\pm A_j$ are resampled because they lie outside the common generic-affine domain, whereas $j=0$ is retained as the identity row. Joining the two input ledgers by index found no mismatch in their address, accumulator, addend, or expected-output columns.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & Original \texttt{8e9c9a2} & Runtime-table $w=16$ \\
+\midrule
+Peak logical width $Q$ & 1,151 & 1,162 \\
+Average executed Toffoli $T$ & 1,299,440.793 & 1,684,160.924 \\
+$Q\times T$ & 1,495,656,352.743 & 1,956,994,993.688 \\
+Classical-output failures & 154 ($0.1540\%$) & 151 ($0.1510\%$) \\
+Phase failures & 115 ($0.1150\%$) & 117 ($0.1170\%$) \\
+Ancilla failures & 0 & 0 \\
+Inputs failing any channel & 192 ($0.1920\%$) & 191 ($0.1910\%$) \\
+Wilson 95\% interval, any channel & $[0.1667\%,0.2211\%]$ & $[0.1658\%,0.2200\%]$ \\
+\bottomrule
+\end{tabular}
+\caption{Paired evaluation on 100,000 independently seeded inputs. Failure categories overlap.}
+\label{tab:paired-100k-results}
+\end{table}
+
+Of the 100,000 inputs, 162 fail at least one channel in both circuits, 30 fail only in the baseline, 29 fail only in the windowed circuit, and 99,779 fail in neither. A two-sided exact sign test on the 59 discordant outcomes gives $p_{\mathrm{sign}}=1.0$. All 151 classical-output failures of the windowed circuit are also classical failures of the baseline; the windowed circuit introduces no new classical mismatch on this corpus and removes three, including both sampled identity rows. Phase outcomes differ more because the windowed circuit introduces additional measurement-based routing cleanup. The observed one-input difference in total failures is negligible relative to sampling uncertainty, so the experiment supports comparable empirical error rates rather than an accuracy advantage for either circuit.
+
+On this shared corpus, coherent runtime-table selection adds 11 logical qubits ($0.956\%$), 384,720.131 average executed Toffoli gates ($29.607\%$), and $30.845\%$ to the $Q\times T$ proxy. The evaluator writes one input record before committing each 64-input batch, synchronizes both files to durable storage, and binds each checkpoint to the interface, seed, requested corpus size, resource dimensions, and operation-stream fingerprint. A restarted run truncates any uncommitted input tail and skips every committed batch, allowing the experiment to resume without discarding completed cases.
+
 \subsection{Correlated multi-call tests for \texorpdfstring{$w=0,\ldots,5$}{w=0,...,5}}
 
 To test composition rather than isolated calls, the evaluator retains one accumulator, supplies a new coherent address, applies the same emitted kernel four times, and checks the intermediate accumulator, preserved address, phase increment, and every non-interface qubit after each call. For each $w\in\{0,\ldots,5\}$, 256 four-call sequences were evaluated, giving 1,024 additions per width and 6,144 calls in total.
@@ -318,6 +347,21 @@ WINDOWED_MODE=1 WINDOW_BITS=16 WINDOWED_TESTS=9024 \
 \end{lstlisting}
 Set \nolinkurl{WINDOWED_SEQUENCE_CALLS=4} to select the correlated test mode; repeat emission and evaluation with \nolinkurl{WINDOW_BITS=0}, \ldots, \code{5} to reproduce Table~\ref{tab:small-window-tests}.
 
+\newpage
+The paired 100,000-input experiment uses the same explicit seed and separate checkpoint directories for the two interfaces:
+\begin{lstlisting}
+EVAL_SHARED_SEED=ecdsafail-windowed-independent-random-100k-v1 \
+  MIXED_WINDOW_BITS=16 EVAL_TESTS=100000 EVAL_THREADS=8 \
+  EVAL_MAX_ERROR_RATE=1 EVAL_CHECKPOINT_DIR=<baseline-dir> \
+  ecdsafail run
+
+EVAL_SHARED_SEED=ecdsafail-windowed-independent-random-100k-v1 \
+  WINDOWED_MODE=1 WINDOW_BITS=16 SINGLE_CCX_FANOUT_DISABLE=1 \
+  WINDOWED_TESTS=100000 WINDOWED_MAX_ERROR_RATE=1 EVAL_THREADS=8 \
+  EVAL_CHECKPOINT_DIR=<windowed-dir> ecdsafail run
+\end{lstlisting}
+Reissuing either command validates the checkpoint manifest and resumes only unfinished batches. The compact totals accompanying this note are in \code{paired\_100k\_counts.tsv}.
+
 \section{Limitations}
 
 \begin{itemize}
@@ -330,6 +374,6 @@ Set \nolinkurl{WINDOWED_SEQUENCE_CALLS=4} to select the correlated test mode; re
 
 \section{Conclusion}
 
-The revised construction closes the principal gaps of the fixed-table prototype. It exposes the complete classical point-table ABI, conditions QROM on runtime table bits, derives temporary values within the circuit, handles the identity row, supports $w=0$ and $w=1$, and exactly clears every payload by replay. The resulting 16-bit kernel stays within the requested width bound at $Q=1{,}162$, with $T=1{,}684{,}156.770$ and a measured any-channel error rate of $0.2216\%$. Its remaining limitations are finite-support arithmetic approximations, the standard generic-affine exceptional cases, and the absence of full-Shor integration rather than defects in the lookup/use/unload interface.
+The revised construction closes the principal gaps of the fixed-table prototype. It exposes the complete classical point-table ABI, conditions QROM on runtime table bits, derives temporary values within the circuit, handles the identity row, supports $w=0$ and $w=1$, and exactly clears every payload by replay. The resulting 16-bit kernel stays within the requested width bound at $Q=1{,}162$. On the independently seeded 100,000-input corpus, it uses $T=1{,}684{,}160.924$ average executed Toffoli gates and has a $0.1910\%$ any-channel error rate, statistically indistinguishable from the baseline's $0.1920\%$ rate in the paired comparison. Its remaining limitations are finite-support arithmetic approximations, the standard generic-affine exceptional cases, and the absence of full-Shor integration rather than defects in the lookup/use/unload interface.
 
 \end{document}
