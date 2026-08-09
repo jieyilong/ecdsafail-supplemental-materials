@@ -5,3 +5,7 @@ tmp/*
 */.DS_Store
 */*/.DS_Store
 
+# LaTeX build intermediates
+*.aux
+*.log
+*.out
