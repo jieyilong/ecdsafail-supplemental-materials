@@ -39,13 +39,13 @@
 
 \title{Making Submission \texttt{8e9c9a2} Compatible with Coherent Windowed Point Addition\\[2mm]\large Runtime-table ABI, quantum-circuit construction, and validation}
 \author{ECDSA.Fail Supplemental Technical Note}
-\date{9 August 2026}
+\date{10 August 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Submission \texttt{8e9c9a2} implements mixed elliptic-curve point addition with a classically specified addend. A windowed Shor circuit instead supplies the addend coherently: a quantum address selects a row of a classical point table, the selected point is added to a quantum accumulator, and all address-dependent workspace must be removed. We modify the circuit to expose the quantum registers $X,Y,J$ and $2\cdot2^w$ classical coordinate registers, condition QROM payload operations on those runtime table bits, derive $3x_J$ inside the circuit, handle the identity row coherently, and exactly replay each lookup after use. For $w=16$, the resulting circuit uses $Q=1{,}162$ logical qubits. On an independently seeded corpus shared with the original circuit, its average executed Toffoli count is $T=1{,}684{,}160.924$ over 100,000 inputs. The any-channel error rates are $0.1910\%$ for the windowed circuit and $0.1920\%$ for the baseline, with no ancilla failures in either circuit and an exact paired sign-test value of $p_{\mathrm{sign}}=1.0$. Correlated four-call tests for every $w\in\{0,\ldots,5\}$ additionally exercise 6,144 additions and confirm cleanup after every call. The construction implements a reusable window-selected point-addition kernel on the same generic-affine domain as the source circuit; it is not a complete implementation of Shor's algorithm.
+Submission \texttt{8e9c9a2} implements mixed elliptic-curve point addition with a classically specified addend. A windowed Shor circuit instead supplies the addend coherently: a quantum address selects a row of a classical point table, the selected point is added to a quantum accumulator, and all address-dependent workspace must be removed. We modify the circuit to expose the quantum registers $X,Y,J$ and $2\cdot2^w$ classical coordinate registers, condition QROM payload operations on those runtime table bits, derive $3x_J$ inside the circuit, handle the identity row coherently, and exactly replay each lookup after use. For $w=16$, the resulting circuit uses $Q=1{,}162$ logical qubits. On an independently seeded corpus shared with the original circuit, its average executed Toffoli count is $T=1{,}684{,}160.924$ over 100,000 inputs. The any-channel error rates are $0.1910\%$ for the windowed circuit and $0.1920\%$ for the baseline, with no ancilla failures in either circuit and an exact paired sign-test value of $p_{\mathrm{sign}}=1.0$. Correlated four-call tests for every $w\in\{0,\ldots,5\}$ additionally exercise 6,144 additions and confirm cleanup after every call. This is a compatibility construction rather than a lower-cost competition submission: under the challenge metric, runtime-table selection adds 11 qubits and approximately $29.6\%$ average executed Toffoli work, while table-payload CNOTs increase the static operation stream by a factor of $23.36$. The construction implements a reusable window-selected point-addition kernel on the same generic-affine domain as the source circuit; its arithmetic remains approximate on finite support, and it is not a complete implementation of Shor's algorithm.
 \end{abstract}
 
 \section{Target Interface and Runtime ABI}
@@ -55,7 +55,7 @@ Let $R=(x_R,y_R)$ be the quantum accumulator, let $J$ be a coherent $w$-qubit ad
 U_{\mathrm{win}}:\quad \ket{J}\ket{R}\ket{0}_{W}\longmapsto\ket{J}\ket{R+A_J}\ket{0}_{W},
 \label{eq:window-map}
 \end{equation}
-where $W$ contains the QROM payload, routing qubits, arithmetic scratch, and cleanup state. The address must remain coherent and unchanged, all arithmetic must depend coherently on the selected row, and no row-dependent payload, phase, or ancilla may survive the call.
+where $W$ contains the QROM payload, routing qubits, arithmetic scratch, and cleanup state. The address must remain coherent and unchanged, all arithmetic must depend coherently on the selected row, and no row-dependent payload or ancilla, or phase attributable to the lookup selection, may survive the call. This interface requirement concerns QROM selection and cleanup; it does not assert that the inherited approximate arithmetic is phase-exact on every input.
 
 \begin{figure}[ht]
 \centering
@@ -86,7 +86,7 @@ The emitted register ABI is
 (X,Y,J,\mathcal T_x[0],\mathcal T_y[0],\ldots,\mathcal T_x[2^w-1],\mathcal T_y[2^w-1]),
 \label{eq:abi}
 \end{equation}
-where $X$ and $Y$ are 256-qubit coordinate registers, $J$ is a $w$-qubit quantum register, and every table coordinate is a 256-bit classical input register. Thus, a $w=16$ instance exposes $2\cdot2^{16}$ coordinate registers. The operation stream refers to their bits through classical conditions; replacing one shifted $G$- or public-point table by another changes the input data rather than the circuit topology. The supplied evaluator populates these registers with the reference table $\mathcal T[j]=[j]G$, but the emitted circuit is not restricted to that table.
+where $X$ and $Y$ are 256-qubit coordinate registers, $J$ is a $w$-qubit quantum register, and every table coordinate is a 256-bit classical input register. The ABI requires $\mathcal T[0]=(0,0)$ as the classical encoding of $\mathcal O$. Thus, a $w=16$ instance exposes $2\cdot2^{16}$ coordinate registers. The operation stream refers to their bits through classical conditions; replacing one shifted $G$- or public-point table by another changes the input data rather than the circuit topology. The supplied evaluator populates these registers with the reference table $\mathcal T[j]=[j]G$, but the emitted circuit is not restricted to that table.
 
 \section{Circuit-Level Modifications}
 
@@ -122,13 +122,13 @@ Stage~3 does not require a derived $3x$ table. It loads $x_J$ into a 257-qubit t
 
 \subsection{Identity row and generic-affine domain}
 
-Row $J=0$ represents the elliptic-curve identity $\mathcal O$. The circuit computes a coherent predicate $b=[J\neq0]$, uses $b$ to control the square-subtract in Stage~4 and modular negation in Stage~6, and uncomputes $b$ at the end. When $J=0$, the QROM payloads are zero, so Stages~1--3 leave $(X,Y)$ at $(x_R,y_Rx_R^{-1})$ after division; Stage~4 is disabled; Stage~5 reverses the division map and restores $Y=y_R$; and Stage~6 leaves $X=x_R$. Hence the complete branch returns $R+\mathcal O=R$ without measuring $J$.
+Row $J=0$ represents the elliptic-curve identity $\mathcal O$ and, by the ABI above, supplies zero coordinate payloads. The circuit computes a coherent predicate $b=[J\neq0]$, uses $b$ to control the square-subtract in Stage~4 and modular negation in Stage~6, and uncomputes $b$ at the end. When $J=0$, Stages~1--3 leave $(X,Y)$ at $(x_R,y_Rx_R^{-1})$ after division; Stage~4 is disabled; Stage~5 reverses the division map and restores $Y=y_R$; and Stage~6 leaves $X=x_R$. Hence the complete branch returns $R+\mathcal O=R$ without measuring $J$. For a valid nonidentity \texttt{secp256k1} accumulator, $x_R\neq0$ automatically: an affine point with $x_R=0$ would require $y_R^2=7$, whereas $7$ is a quadratic nonresidue modulo $p$.
 
 The exceptional affine cases $R=A_J$ and $R=-A_J$ remain outside the circuit domain. They make the denominator $x_R-x_J$ vanish and require point doubling or an explicit identity output. This is the same generic-affine restriction used by the source circuit and Schrottenloher's point-addition construction; it is distinct from the table's identity row, which the modified circuit now handles.
 
 \subsection{Low-peak arithmetic}
 
-The QROM payload is live only near its consumer, but it still competes locally with carry ancillas. The modification suppresses carry venting at loaded-data sites and retains only a 64-bit upper comparison during its low-peak modular additions. This support-calibrated approximation exchanges additional Toffoli work and a small correctness risk for fewer simultaneously live carry qubits. The global maximum remains the inverse-application fold after all QROM payloads have been cleared.
+The QROM payload is live only near its consumer, but it still competes locally with carry ancillas. The modification suppresses carry venting at loaded-data sites and compares only the 64 most significant bits during its low-peak modular additions. This comparison agrees with a full-width comparison whenever those prefixes differ, but it is not exact when the prefixes are equal and lower bits determine the ordering. It is therefore a distribution-dependent approximation rather than an all-input guarantee. No new classical mismatch attributable to this comparison was observed in the paired 100,000-input corpus, but that empirical result does not establish worst-case correctness. The global maximum remains the inverse-application fold after all QROM payloads have been cleared.
 
 \section{Runtime QROM and Exact Replay}
 
@@ -179,7 +179,7 @@ After the arithmetic consumer preserves a loaded payload, applying the same XOR 
 L_c^2:\quad \ket{j}\ket{c_j}\longmapsto\ket{j}\ket{c_j\oplus c_j}=\ket{j}\ket{0}.
 \label{eq:replay-unload}
 \end{equation}
-The reported circuit therefore reverses the $K=2$ swaps when applicable and replays the same runtime-table traversal. This exactly removes the payload without measuring it. The traversal's unary-routing AND ancillas are removed using measurement-based uncomputation with conditional phase correction, yielding a clean coherent QROM boundary with no address-dependent residual phase. A measurement-based \emph{payload} unload remains implemented as an optional experiment, but the final resource and correctness results use payload replay.
+The reported circuit therefore reverses the $K=2$ swaps when applicable and replays the same runtime-table traversal. This exactly removes the payload without measuring it. The traversal's unary-routing AND ancillas are removed using measurement-based uncomputation with conditional phase correction. Under the QROM circuit identity, these corrections remove the phase introduced by routing cleanup, so the lookup/replay boundary leaves no row-dependent payload, ancilla, or address-dependent phase. The sparse phase failures reported for the complete point-addition circuit are end-to-end arithmetic failures and are not, by themselves, evidence of a residual QROM-selection phase. A measurement-based \emph{payload} unload remains implemented as an optional experiment, but the final resource and correctness results use payload replay.
 
 \begin{table}[ht]
 \centering
@@ -226,7 +226,7 @@ These changes establish window compatibility because $J$ is a genuine quantum re
 
 \section{Resource Measurements}
 
-The fully emitted $w=16$ circuit contains 213,387,745 operations. Its measured peak remains the inverse-application fold, where all QROM payloads have already been released. Table~\ref{tab:resources} compares the result with the reported \texttt{8e9c9a2} operating point. The two executed-Toffoli values are measured on their respective deterministic evaluator supports, so the table characterizes resource overhead rather than a paired error experiment.
+The fully emitted $w=16$ circuit contains 213,387,745 operations. Its measured peak remains the inverse-application fold, where all QROM payloads have already been released. Table~\ref{tab:resources} compares the result with the reported \texttt{8e9c9a2} operating point. The two executed-Toffoli values are measured on their respective deterministic 9,024-input evaluator supports, so the table characterizes resource overhead rather than a paired error experiment. By contrast, the abstract, Table~\ref{tab:paired-100k-results}, and the conclusion report $T$ on the common 100,000-input corpus; small differences between the two sets of averages are expected because executed Toffoli cost is input-dependent.
 
 \begin{table}[ht]
 \centering
@@ -241,11 +241,11 @@ $Q\times T$ & 1,495,670,403 & 1,956,990,167 & $+30.84\%$ \\
 Static emitted operations & 9,133,449 & 213,387,745 & $23.36\times$ \\
 \bottomrule
 \end{tabular}
-\caption{Resource overhead of coherent runtime-table selection. Table-payload CNOTs dominate the static stream and are not counted as Toffoli gates.}
+\caption{Resource overhead of coherent runtime-table selection on the circuits' respective deterministic 9,024-input evaluator supports. Table-payload CNOTs dominate the static stream and are not counted as Toffoli gates.}
 \label{tab:resources}
 \end{table}
 
-The final circuit uses one more qubit and more Toffoli work than the earlier fixed-table, measurement-unload prototype. That increase is the cost of closing the principal interface and cleanup gaps: table data are now runtime inputs, and every payload is removed by exact replay. The persistent $w=16$ address itself does not imply a 16-qubit increase in $Q$, because the original and modified circuits have different concurrent scratch allocations at their maxima.
+The final circuit uses one more qubit and more Toffoli work than the earlier fixed-table, measurement-unload prototype. That increase is the cost of closing the principal interface and cleanup gaps: table data are now runtime inputs, and every payload is removed by exact replay. The persistent $w=16$ address itself does not imply a 16-qubit increase in $Q$, because the original and modified circuits have different concurrent scratch allocations at their maxima. The $Q\times T$ comparison follows the challenge convention and therefore does not price the 167,772,160 emitted table-payload CNOTs, measurements, classical feed-forward, or table storage. The $23.36\times$ increase in static operations may be material under a fault-tolerant architecture that assigns non-negligible cost to these operations. This note compares the adapter only with its \texttt{8e9c9a2} baseline and makes no cross-work dominance claim.
 
 \section{Validation}
 
@@ -271,7 +271,7 @@ Identity selections & 1 / 9,024 ($0.0111\%$) \\
 \label{tab:full-errors}
 \end{table}
 
-The identity case returned the input coordinates, preserved $J=0$, and had no classical, phase, or ancilla failure. Exact payload replay produced no QROM cleanup failure on any shot. The residual classical and phase failures are consistent with the fixed-length dialog-GCD schedule, inherited truncated arithmetic, and the window adapter's 64-bit upper comparison; the present experiment does not supply a coherent failure flag for these approximations.
+The identity case returned the input coordinates, preserved $J=0$, and had no classical, phase, or ancilla failure. Exact payload replay produced no dirty payload or routing ancilla on any shot. The residual classical and phase failures occur on ordinary inputs within the declared generic-affine domain and are distinct from the excluded cases $R=\pm A_J$. They are consistent with the fixed-length dialog-GCD schedule and inherited finite-width arithmetic; the 64-bit upper comparison is an additional potential approximation, although the experiment does not isolate any failure caused by it. The circuit does not supply a coherent flag for any of these arithmetic failures.
 
 The evaluator records one durable row per input and one commit record per 64-shot batch. On restart, it truncates any uncommitted input tail, reconstructs aggregate counts, and evaluates only unfinished batches. This checkpoint mechanism produced the complete 9,024-case ledger used above.
 
@@ -300,7 +300,7 @@ Wilson 95\% interval, any channel & $[0.1667\%,0.2211\%]$ & $[0.1658\%,0.2200\%]
 \label{tab:paired-100k-results}
 \end{table}
 
-Of the 100,000 inputs, 162 fail at least one channel in both circuits, 30 fail only in the baseline, 29 fail only in the windowed circuit, and 99,779 fail in neither. A two-sided exact sign test on the 59 discordant outcomes gives $p_{\mathrm{sign}}=1.0$. All 151 classical-output failures of the windowed circuit are also classical failures of the baseline; the windowed circuit introduces no new classical mismatch on this corpus and removes three, including both sampled identity rows. Phase outcomes differ more because the windowed circuit introduces additional measurement-based routing cleanup. The observed one-input difference in total failures is negligible relative to sampling uncertainty, so the experiment supports comparable empirical error rates rather than an accuracy advantage for either circuit.
+Of the 100,000 inputs, 162 fail at least one channel in both circuits, 30 fail only in the baseline, 29 fail only in the windowed circuit, and 99,779 fail in neither. A two-sided exact sign test on the 59 discordant outcomes gives $p_{\mathrm{sign}}=1.0$. All 151 classical-output failures of the windowed circuit are also classical failures of the baseline; the windowed circuit introduces no new classical mismatch on this corpus and removes three, including both sampled identity rows. The sets of phase-failing inputs differ because the two operation streams and their measurement histories are not identical, but this end-to-end experiment does not attribute a phase failure to a particular subroutine. The observed one-input difference in total failures is negligible relative to sampling uncertainty, so the experiment supports comparable empirical error rates rather than an accuracy advantage for either circuit.
 
 On this shared corpus, coherent runtime-table selection adds 11 logical qubits ($0.956\%$), 384,720.131 average executed Toffoli gates ($29.607\%$), and $30.845\%$ to the $Q\times T$ proxy. The evaluator writes one input record before committing each 64-input batch, synchronizes both files to durable storage, and binds each checkpoint to the interface, seed, requested corpus size, resource dimensions, and operation-stream fingerprint. A restarted run truncates any uncommitted input tail and skips every committed batch, allowing the experiment to resume without discarding completed cases.
 
@@ -366,14 +366,14 @@ Reissuing either command validates the checkpoint manifest and resumes only unfi
 
 \begin{itemize}
 \item \textbf{Generic-affine exceptional cases.} The identity table row is supported, but $R=A_J$ and $R=-A_J$ remain outside the circuit domain, as in the underlying generic-affine construction.
-\item \textbf{Approximate arithmetic.} The inherited fixed-length dialog-GCD, finite-width arithmetic, and window-specific 64-bit upper comparison produce sparse classical and phase errors. The modified circuit does not convert these events into a coherent failure flag.
-\item \textbf{Finite-support evidence.} The experiments establish behavior only on the stated corpora; they are not an all-input proof or a coherent full-attack error estimate.
+\item \textbf{Approximate arithmetic on ordinary inputs.} Independently of the exceptional cases above, the inherited fixed-length dialog-GCD and finite-width arithmetic produce sparse classical and phase errors on generic-affine inputs. The window-specific 64-bit comparison introduces a further worst-case approximation, although it produced no identifiable new classical mismatch on the paired corpus. The modified circuit does not convert any arithmetic failure into a coherent flag.
+\item \textbf{Finite-support and composition.} The experiments establish behavior only on the stated corpora; they are not an all-input proof or a coherent full-attack error estimate. In a complete Shor computation, silent errors can accumulate coherently across repeated additions and cannot be interpreted as independently retryable classical failures without an additional error model or detection mechanism.
 \item \textbf{Kernel rather than full Shor.} The branch implements a reusable runtime-table point-addition call. A complete attack must instantiate all shifted $G$ and $P$ tables, schedule all windows, and validate the complete double-scalar multiplication and Fourier/postprocessing layers.
-\item \textbf{Accounting convention.} Resource counts follow the challenge model. A fault-tolerant architecture may assign different costs to classical table storage, Clifford gates, measurements, and feed-forward.
+\item \textbf{Accounting convention.} Resource counts follow the challenge model, which optimizes logical qubits times average executed Toffoli gates. The emitted table-payload CNOTs dominate the $23.36\times$ larger static operation stream but do not contribute to $T$; a fault-tolerant architecture may assign non-negligible costs to these Clifford operations, classical table storage, measurements, and feed-forward.
 \end{itemize}
 
 \section{Conclusion}
 
-The revised construction closes the principal gaps of the fixed-table prototype. It exposes the complete classical point-table ABI, conditions QROM on runtime table bits, derives temporary values within the circuit, handles the identity row, supports $w=0$ and $w=1$, and exactly clears every payload by replay. The resulting 16-bit kernel stays within the requested width bound at $Q=1{,}162$. On the independently seeded 100,000-input corpus, it uses $T=1{,}684{,}160.924$ average executed Toffoli gates and has a $0.1910\%$ any-channel error rate, statistically indistinguishable from the baseline's $0.1920\%$ rate in the paired comparison. Its remaining limitations are finite-support arithmetic approximations, the standard generic-affine exceptional cases, and the absence of full-Shor integration rather than defects in the lookup/use/unload interface.
+The revised construction closes the principal lookup-interface gaps of the fixed-table prototype. It exposes the complete classical point-table ABI, conditions QROM on runtime table bits, derives temporary values within the circuit, handles the identity row, supports $w=0$ and $w=1$, and exactly clears every payload by replay. The resulting 16-bit kernel stays within the requested width bound at $Q=1{,}162$. On the independently seeded 100,000-input corpus, it uses $T=1{,}684{,}160.924$ average executed Toffoli gates and has a $0.1910\%$ any-channel error rate, statistically indistinguishable from the baseline's $0.1920\%$ rate in the paired comparison. These figures follow the challenge's $Q\times T$ accounting; the static operation stream is $23.36\times$ larger and may matter under other architectures. The result is therefore a window-compatible kernel under the stated benchmark interface, not a lower-cost competition submission or a validated full-Shor circuit. Its remaining limitations are approximate arithmetic without a coherent failure flag, finite-support validation, the standard generic-affine exceptional cases, and the absence of full-Shor integration.
 
 \end{document}
