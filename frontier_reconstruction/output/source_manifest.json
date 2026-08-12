@@ -1,0 +1,112 @@
+{
+  "data_cutoff_at": "2026-07-26T09:21:55.494Z",
+  "implementation": {
+    "README.md": {
+      "bytes": 3225,
+      "sha256": "7ea8a27666d32d4420b842f76c710b078633e745325e281698488f4bb3cf015b"
+    },
+    "data/curation/reconstruction-50pct.json": {
+      "bytes": 7266,
+      "sha256": "56ec6b7a876dbb4a7aedd31324220f6c637224862d08f415197f39a1982a4009"
+    },
+    "requirements.txt": {
+      "bytes": 32,
+      "sha256": "0043aca3a7381487084576995105e1099e3786ae8add5a6c0951d305b0e0e757"
+    },
+    "scripts/reconstruct.py": {
+      "bytes": 48880,
+      "sha256": "1dcf1ab1ab1bc0900b74d7430d0e65ca59ab6fc264446b92a6830391611aab48"
+    },
+    "scripts/verify_paper_integration.py": {
+      "bytes": 7798,
+      "sha256": "1c4f5b1acc99a5df9a5fc90cd0ab40a8bc1f910e90092f2966d4157c1b321887"
+    },
+    "tests/test_50pct_reconstruction.py": {
+      "bytes": 4539,
+      "sha256": "a4502e5817f9b76623b24b2a5051934cb432dccb9b5aed7889e6740171260313"
+    },
+    "tests/test_verify_paper_integration.py": {
+      "bytes": 2382,
+      "sha256": "1d8430811db9e4025173afadfbf175be8175159fa28ba1356af2dd5a7dc7d0d7"
+    }
+  },
+  "outputs": {
+    "admitted_pareto_note_sensitivity.csv": {
+      "bytes": 6744,
+      "sha256": "99d2e568c2f2517a05cdc50a0c71ff2f4728cf928a5fdc7e824504bcc48abf14"
+    },
+    "figure_data.json": {
+      "bytes": 37514,
+      "sha256": "9b52f912517622e33bc135557704031bae9337a3d8684962f3a587a45eff0f00"
+    },
+    "frontier_figure_paper.pdf": {
+      "bytes": 4620,
+      "sha256": "cc26cfb7954f586d440bbbaddec179fb88133c98dbe1b0e382a57c4b77c17c7d"
+    },
+    "frontier_figure_paper.png": {
+      "bytes": 27924,
+      "sha256": "0973fa18f75e4daae0a9a4a223bfb26fcff18d0cce7abaa5708e8c1637a048b7"
+    },
+    "frontier_figure_paper.svg": {
+      "bytes": 8000,
+      "sha256": "ab269be6f7a7573b1b5de6f97499b83e239200791eac1710fd3a3ecd41464d1e"
+    },
+    "frontier_figure_policy_sensitivity.pdf": {
+      "bytes": 6624,
+      "sha256": "248c5869b7c1925c208d85b3a8f90d2ebb4c05c600ba2684ebf1f851521f0674"
+    },
+    "frontier_figure_policy_sensitivity.png": {
+      "bytes": 120713,
+      "sha256": "cffe75d17cc731b09c5fb633eab85aafb6699e1a28072c6af2d0138d7e487691"
+    },
+    "frontier_figure_policy_sensitivity.svg": {
+      "bytes": 11488,
+      "sha256": "71717f69662028895c02720389acc1dba9fafc6f376f30ea027a886a9acef205"
+    },
+    "ledger_reconciliation.csv": {
+      "bytes": 19937,
+      "sha256": "bffc92a1b26454fb71052cc78d79586aeb53d8b30977b927816c7ca5423105a6"
+    },
+    "pareto_manifest.csv": {
+      "bytes": 3244,
+      "sha256": "210cd091647c9dfbdbfa768ad2213b0955d696721a02b86c51b0aaf1a58a1c8d"
+    },
+    "pareto_pinned_api_metrics.csv": {
+      "bytes": 3460,
+      "sha256": "c6ad2352b6dbc9ab9818ef1fea8d457ad58a08f8208bab69ff0a578de6b2ca05"
+    },
+    "transition_slice.csv": {
+      "bytes": 5002,
+      "sha256": "0cc2213f9d7068d2b2cbf7e906e6b364863db8a97e200b6e7ca7afe0a220f174"
+    },
+    "verification_report.json": {
+      "bytes": 9768,
+      "sha256": "8594c7525bae08eb0cb63a596b7542db53798c1a770994bcf50140c152fc7f61"
+    }
+  },
+  "schema_version": 6,
+  "sources": {
+    "api_checkpoint": {
+      "captured_at": "2026-06-25T06:14:05Z",
+      "expected_rows": 763,
+      "path": "data/raw/pareto_mirror_checkpoint_2026-06-25T061405Z.json",
+      "sha256": "c40e37d5995c9fd5a74dc831bdeb125802cbf987859a42c172fd91997ed9413b",
+      "source_commit": "c44ee5f04bbce74aa26a73c664914b7a449a0d84",
+      "source_repository": "https://github.com/welttowelt/pareto-mirror"
+    },
+    "chronology": {
+      "document_url": "https://docs.google.com/document/d/1-yth9tqrwfegsDMsQT9oHz388aP8mxqIFDSr3WxKUfs/edit?tab=t.0",
+      "expected_rows": 80,
+      "path": "data/raw/teddy_contribution_chronology_2026-07-02.csv",
+      "published_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOdImD7IZYBnzIm2_W-tt0HKNwrYsIGyMUR5Y7y8wEIZVfh5yFr14DknwemkZGx5KMV81z5ZLtPHSU/pub?output=csv",
+      "sha256": "cf267b72cec67b850a0cf1ec9bcf3390077a9945ebf6d009088b7b89029bc255"
+    },
+    "official_submissions": {
+      "endpoint": "https://api.ecdsa.fail/api/benchmarks/1ffb695a-309b-46b6-a728-2f97d8c7be74/submissions",
+      "expected_rows": 831,
+      "fetched_at": "2026-07-27T16:16:01Z",
+      "path": "data/raw/official_submissions_2026-07-27T161558Z.json",
+      "sha256": "915af8b7be4283dbd357d5e8ed013d91c494e81fcee6528aa3dc1385706aebec"
+    }
+  }
+}

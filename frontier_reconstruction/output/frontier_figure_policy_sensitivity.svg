@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.00" y="0.00" width="1200.00" height="640.00" stroke="#FFFFFF" fill="#FFFFFF" stroke-width="0"/>
+<text x="58.00" y="35.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start">Inclusion-rule sensitivity at the 50% data cutoff</text>
+<text x="58.00" y="57.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="400" text-anchor="start">API metrics, explicit note evidence, and the paper&#x27;s curated selection produce different sets.</text>
+<rect x="78.00" y="105.00" width="735.00" height="410.00" stroke="#D9DEE3" fill="#F7F8F9" stroke-width="1"/>
+<line x1="78.00" y1="105.00" x2="78.00" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="78.00" y="531.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="middle">800</text>
+<line x1="261.75" y1="105.00" x2="261.75" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="261.75" y="531.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="middle">900</text>
+<line x1="445.50" y1="105.00" x2="445.50" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="445.50" y="531.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="middle">1,000</text>
+<line x1="629.25" y1="105.00" x2="629.25" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="629.25" y="531.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="middle">1,100</text>
+<line x1="813.00" y1="105.00" x2="813.00" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="813.00" y="531.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="middle">1,200</text>
+<line x1="78.00" y1="515.00" x2="813.00" y2="515.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="73.00" y="518.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="end">1M</text>
+<line x1="78.00" y1="367.42" x2="813.00" y2="367.42" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="73.00" y="370.42" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="end">10M</text>
+<line x1="78.00" y1="219.84" x2="813.00" y2="219.84" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="73.00" y="222.84" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="end">100M</text>
+<text x="445.50" y="543.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" text-anchor="middle">Peak logical qubits (Q)</text>
+<text x="78.00" y="92.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" text-anchor="start">A  |  Pareto sets under three admission rules</text>
+<polyline points="123.94,118.09 125.78,119.39 129.45,123.71 349.95,258.41 408.75,299.52 689.89,490.72 722.96,498.21 735.83,498.55" fill="none" stroke="#68737D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5"/>
+<polyline points="123.94,118.09 125.78,119.39 129.45,123.71 145.99,130.58 348.11,250.53 349.95,258.41 381.19,288.85 395.89,300.68 399.56,302.35 689.89,490.72 704.59,492.36 706.42,492.72 713.77,493.04 715.61,493.58 722.96,498.21 735.83,498.55" fill="none" stroke="#D55E00" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 4"/>
+<polyline points="122.10,177.88 348.11,250.53 349.95,258.41 381.19,288.85 386.70,289.98 395.89,300.68 399.56,302.35 689.89,490.72 704.59,492.36 706.42,492.72 708.26,492.90 713.77,493.04 715.61,493.58 722.96,498.21 735.83,498.55" fill="none" stroke="#0072B2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="160.00" y1="132.00" x2="184.00" y2="132.00" stroke="#68737D" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="192.00" y="136.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="8.8" font-weight="400" text-anchor="start">paper admitted 8</text>
+<line x1="272.00" y1="132.00" x2="296.00" y2="132.00" stroke="#D55E00" stroke-width="2" stroke-dasharray="3 4"/>
+<text x="304.00" y="136.00" fill="#D55E00" font-family="Arial, Helvetica, sans-serif" font-size="8.8" font-weight="400" text-anchor="start">note rule 16</text>
+<line x1="406.00" y1="132.00" x2="430.00" y2="132.00" stroke="#0072B2" stroke-width="2.4"/>
+<text x="438.00" y="136.00" fill="#0072B2" font-family="Arial, Helvetica, sans-serif" font-size="8.8" font-weight="400" text-anchor="start">API metrics 15</text>
+<circle cx="123.94" cy="118.09" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="125.78" cy="119.39" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="129.45" cy="123.71" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="349.95" cy="258.41" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="408.75" cy="299.52" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="689.89" cy="490.72" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="722.96" cy="498.21" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="735.83" cy="498.55" r="4.1" stroke="#68737D" fill="#FFFFFF" stroke-width="1.6"/>
+<circle cx="123.94" cy="118.09" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="125.78" cy="119.39" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="129.45" cy="123.71" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="145.99" cy="130.58" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="348.11" cy="250.53" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="349.95" cy="258.41" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="381.19" cy="288.85" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="395.89" cy="300.68" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="399.56" cy="302.35" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="689.89" cy="490.72" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="704.59" cy="492.36" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="706.42" cy="492.72" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="713.77" cy="493.04" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="715.61" cy="493.58" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="722.96" cy="498.21" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="735.83" cy="498.55" r="3.2" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.5"/>
+<circle cx="122.10" cy="177.88" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="348.11" cy="250.53" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="349.95" cy="258.41" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="381.19" cy="288.85" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="386.70" cy="289.98" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="395.89" cy="300.68" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="399.56" cy="302.35" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="689.89" cy="490.72" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="704.59" cy="492.36" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="706.42" cy="492.72" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="708.26" cy="492.90" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="713.77" cy="493.04" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="715.61" cy="493.58" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="722.96" cy="498.21" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<circle cx="735.83" cy="498.55" r="2.7" stroke="#0072B2" fill="#0072B2" stroke-width="1"/>
+<text x="855.00" y="104.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" text-anchor="start">B  |  What changes</text>
+<text x="855.00" y="135.00" fill="#0072B2" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" text-anchor="start">API-metric rows</text>
+<text x="855.00" y="153.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="9.4" font-weight="400" text-anchor="start">15 points from metric-bearing rows in the declared population.</text>
+<text x="855.00" y="170.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9.2" font-weight="400" text-anchor="start">Structured API metrics; no validator-clean inference.</text>
+<text x="855.00" y="210.00" fill="#D55E00" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" text-anchor="start">Public-note parser</text>
+<text x="855.00" y="228.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="9.4" font-weight="400" text-anchor="start">16 points; prose format changes admission.</text>
+<text x="855.00" y="250.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="8.7" font-weight="400" text-anchor="start">API-only: ddb641a, 3bd88ad, 71b9cc4</text>
+<text x="855.00" y="268.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="8.7" font-weight="400" text-anchor="start">Note-only after re-frontiering: b6f2b0a, f1d8707, 39a9b5f, 05f3483</text>
+<text x="855.00" y="310.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" text-anchor="start">Paper-admitted set</text>
+<text x="855.00" y="328.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="9.4" font-weight="400" text-anchor="start">8 points under the paper&#x27;s curated admission rule.</text>
+<text x="855.00" y="350.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="8.9" font-weight="400" text-anchor="start">Pinned-response frontier adds 11 IDs.</text>
+<text x="855.00" y="368.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="8.7" font-weight="400" text-anchor="start">Paper-only after re-frontiering: b6f2b0a, f1d8707, 39a9b5f, 4352cfb</text>
+<text x="855.00" y="420.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" text-anchor="start">Interpretation</text>
+<text x="855.00" y="440.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9.4" font-weight="400" text-anchor="start">Main figure uses the paper-admitted set.</text>
+<text x="855.00" y="457.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9.4" font-weight="400" text-anchor="start">Other sets are sensitivity analyses, not alternate headline results.</text>
+<text x="58.00" y="618.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="400" text-anchor="start">Reviewer audit figure. No set is promoted to validator-clean status by API metrics alone.</text>
+</svg>

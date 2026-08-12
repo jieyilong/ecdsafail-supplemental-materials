@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="255" viewBox="0 0 360 255">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.00" y="0.00" width="360.00" height="255.00" stroke="#FFFFFF" fill="#FFFFFF" stroke-width="0"/>
+<text x="36.00" y="15.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" text-anchor="start">Frontier at the 50% data cutoff</text>
+<text x="36.00" y="27.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.5" font-weight="400" text-anchor="start">15 selected transitions; 8 admitted Pareto points</text>
+<rect x="36.00" y="43.00" width="306.00" height="148.00" stroke="#D9DEE3" fill="#F7F8F9" stroke-width="1"/>
+<line x1="36.00" y1="43.00" x2="36.00" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="36.00" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">800</text>
+<line x1="97.20" y1="43.00" x2="97.20" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="97.20" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">1,200</text>
+<line x1="158.40" y1="43.00" x2="158.40" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="158.40" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">1,600</text>
+<line x1="219.60" y1="43.00" x2="219.60" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="219.60" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">2,000</text>
+<line x1="280.80" y1="43.00" x2="280.80" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="280.80" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">2,400</text>
+<line x1="342.00" y1="43.00" x2="342.00" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="342.00" y="204.20" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="middle">2,800</text>
+<line x1="36.00" y1="191.00" x2="342.00" y2="191.00" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="31.00" y="193.07" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="end">1M</text>
+<line x1="36.00" y1="137.73" x2="342.00" y2="137.73" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="31.00" y="139.79" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="end">10M</text>
+<line x1="36.00" y1="84.45" x2="342.00" y2="84.45" stroke="#D9DEE3" stroke-width="0.8"/>
+<text x="31.00" y="86.52" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="end">100M</text>
+<text x="189.00" y="216.20" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="7.2" font-weight="700" text-anchor="middle">Peak logical qubits (Q)</text>
+<text x="36.00" y="38.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.5" font-weight="700" text-anchor="start">Average executed Toffoli (log scale)</text>
+<polyline points="329.00,159.15 267.03,161.01 223.43,169.25 173.39,170.29 154.12,177.78 126.88,179.70 112.50,183.15 91.69,182.99 90.93,183.41 89.86,183.81 89.70,184.94" fill="none" stroke="#007C78" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="59.26,90.16 69.51,111.51 40.28,49.75 39.83,47.73" fill="none" stroke="#D55E00" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="39.83,47.73 39.98,48.19 40.28,49.75 58.64,98.38 63.54,113.22 86.95,182.24 89.70,184.94 90.77,185.06" fill="none" stroke="#1F2933" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+<circle cx="329.00" cy="159.15" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="267.03" cy="161.01" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="223.43" cy="169.25" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="173.39" cy="170.29" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="154.12" cy="177.78" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="126.88" cy="179.70" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="112.50" cy="183.15" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="91.69" cy="182.99" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="90.93" cy="183.41" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="89.86" cy="183.81" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="89.70" cy="184.94" r="2.2" stroke="#007C78" fill="#FFFFFF" stroke-width="1.1"/>
+<polygon points="59.26,87.46 61.96,90.16 59.26,92.86 56.56,90.16" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.1"/>
+<polygon points="69.51,108.81 72.21,111.51 69.51,114.21 66.81,111.51" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.1"/>
+<polygon points="40.28,47.05 42.98,49.75 40.28,52.45 37.58,49.75" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.1"/>
+<polygon points="39.83,45.03 42.53,47.73 39.83,50.43 37.12,47.73" stroke="#D55E00" fill="#FFFFFF" stroke-width="1.1"/>
+<circle cx="39.83" cy="47.73" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="39.98" cy="48.19" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="40.28" cy="49.75" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="58.64" cy="98.38" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="63.54" cy="113.22" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="86.95" cy="182.24" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="89.70" cy="184.94" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<circle cx="90.77" cy="185.06" r="1.35" stroke="#1F2933" fill="#1F2933" stroke-width="0.8"/>
+<text x="326.00" y="154.15" fill="#007C78" font-family="Arial, Helvetica, sans-serif" font-size="5.8" font-weight="700" text-anchor="end">30c8ded</text>
+<text x="92.70" y="193.94" fill="#007C78" font-family="Arial, Helvetica, sans-serif" font-size="5.8" font-weight="700" text-anchor="start">8e9c9a2</text>
+<text x="42.83" y="65.73" fill="#D55E00" font-family="Arial, Helvetica, sans-serif" font-size="5.8" font-weight="700" text-anchor="start">b6f2b0a</text>
+<text x="58.28" y="51.75" fill="#D55E00" font-family="Arial, Helvetica, sans-serif" font-size="5.8" font-weight="700" text-anchor="start">39a9b5f</text>
+<line x1="38.00" y1="226.00" x2="51.00" y2="226.00" stroke="#007C78" stroke-width="1.4"/>
+<circle cx="44.50" cy="226.00" r="2" stroke="#007C78" fill="#FFFFFF" stroke-width="1"/>
+<text x="55.00" y="228.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="start">product milestones</text>
+<line x1="135.00" y1="226.00" x2="148.00" y2="226.00" stroke="#D55E00" stroke-width="1.4"/>
+<polygon points="141.50,223.60 143.90,226.00 141.50,228.40 139.10,226.00" stroke="#D55E00" fill="#FFFFFF" stroke-width="1"/>
+<text x="152.00" y="228.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="start">low-Q foreground</text>
+<line x1="235.00" y1="226.00" x2="248.00" y2="226.00" stroke="#1F2933" stroke-width="1.2" stroke-dasharray="3 2"/>
+<text x="252.00" y="228.00" fill="#1F2933" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="start">admitted Pareto set</text>
+<text x="36.00" y="247.00" fill="#68737D" font-family="Arial, Helvetica, sans-serif" font-size="6.2" font-weight="400" text-anchor="start">Data cutoff: 26 Jul 09:21 UTC; pinned response; non-exhaustive.</text>
+</svg>
