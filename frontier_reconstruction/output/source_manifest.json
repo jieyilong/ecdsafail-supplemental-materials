@@ -2,8 +2,8 @@
   "data_cutoff_at": "2026-07-26T09:21:55.494Z",
   "implementation": {
     "README.md": {
-      "bytes": 3225,
-      "sha256": "7ea8a27666d32d4420b842f76c710b078633e745325e281698488f4bb3cf015b"
+      "bytes": 3252,
+      "sha256": "1555ea28829ecb961e2d6866ea11af6e7cb397cd5482eb3107a839524f23478d"
     },
     "data/curation/reconstruction-50pct.json": {
       "bytes": 7266,
@@ -18,16 +18,16 @@
       "sha256": "1dcf1ab1ab1bc0900b74d7430d0e65ca59ab6fc264446b92a6830391611aab48"
     },
     "scripts/verify_paper_integration.py": {
-      "bytes": 7798,
-      "sha256": "1c4f5b1acc99a5df9a5fc90cd0ab40a8bc1f910e90092f2966d4157c1b321887"
+      "bytes": 8352,
+      "sha256": "ff7121662a90e298fda3c23964054f15d18e45ad137333ec5051aa9e31e00476"
     },
     "tests/test_50pct_reconstruction.py": {
       "bytes": 4539,
       "sha256": "a4502e5817f9b76623b24b2a5051934cb432dccb9b5aed7889e6740171260313"
     },
     "tests/test_verify_paper_integration.py": {
-      "bytes": 2382,
-      "sha256": "1d8430811db9e4025173afadfbf175be8175159fa28ba1356af2dd5a7dc7d0d7"
+      "bytes": 3139,
+      "sha256": "a6daef54b6804b22f9baead6b67c3c750b2ef094b23f5ac044737fac5867b997"
     }
   },
   "outputs": {

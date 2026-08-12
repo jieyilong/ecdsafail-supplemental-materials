@@ -1,8 +1,9 @@
 # ECDSA.Fail frontier reconstruction at the 50% data cutoff
 
-This directory contains the data and code used to reproduce Figure 7 and the
-frontier analysis in Section 5.4 of the ECDSA.Fail paper. It reconstructs the
-selected historical points under three admission rules from pinned public data.
+This directory contains the frozen data and code used to reproduce Figure 7
+and the frontier analysis in the paper's "Reproducibility of the Results"
+subsection. It reconstructs the selected historical points under three
+admission rules from pinned public data.
 
 ## Confirmed data cutoff
 

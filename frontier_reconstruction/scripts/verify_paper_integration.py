@@ -24,6 +24,12 @@ PAPER_ADMITTED_IDS = (
     "a536a48",
 )
 
+SECTION_5_HEADING = r"^\s*5\s+Results and Findings\s*$"
+REPRODUCIBILITY_HEADING = (
+    r"^\s*5\.\d+\s+Reproducibility of the Results\s*$"
+)
+LIMITATIONS_HEADING = r"^\s*6\s+Limitations,\s*Safety.*$"
+
 
 def run_text(command: list[str]) -> str:
     completed = subprocess.run(
@@ -58,9 +64,14 @@ def contains(text: str, pattern: str) -> bool:
 
 
 def section_window(text: str, start_pattern: str, end_pattern: str) -> str:
-    start = re.search(start_pattern, text, flags=re.IGNORECASE | re.MULTILINE)
-    if start is None:
+    starts = list(
+        re.finditer(start_pattern, text, flags=re.IGNORECASE | re.MULTILINE)
+    )
+    if not starts:
         return ""
+    # Long-form drafts include the headings in a table of contents. The final
+    # match is the section body rather than the earlier table-of-contents entry.
+    start = starts[-1]
     end = re.search(
         end_pattern,
         text[start.end() :],
@@ -74,18 +85,18 @@ def section_window(text: str, start_pattern: str, end_pattern: str) -> str:
 def evaluate_text(text: str) -> dict[str, bool]:
     section_5 = section_window(
         text,
-        r"^\s*5\s+Results and Findings",
-        r"^\s*6\s+Limitations,\s*Safety",
+        SECTION_5_HEADING,
+        LIMITATIONS_HEADING,
     )
-    section_5_4 = section_window(
+    reproducibility = section_window(
         text,
-        r"^\s*5\.4\s+Reproducibility of the Results",
-        r"^\s*6\s+Limitations,\s*Safety",
+        REPRODUCIBILITY_HEADING,
+        LIMITATIONS_HEADING,
     )
 
     return {
         "section_5_heading_present": bool(section_5),
-        "section_5_4_heading_present": bool(section_5_4),
+        "reproducibility_heading_present": bool(reproducibility),
         "confirmed_cutoff_present": (
             contains(section_5, r"26 July 2026")
             and contains(section_5, r"09:21:55 UTC")
@@ -95,7 +106,7 @@ def evaluate_text(text: str) -> dict[str, bool]:
             and contains(section_5, r"60d61859fa69")
         ),
         "snapshot_counts_present": all(
-            contains(section_5_4, pattern)
+            contains(reproducibility, pattern)
             for pattern in (
                 r"contains 831 rows",
                 r"including 826 created by the cutoff",
@@ -114,14 +125,14 @@ def evaluate_text(text: str) -> dict[str, bool]:
             r"black polyline is the eight-point archive-conditioned Pareto set",
         ),
         "artifact_reference_present": contains(
-            section_5_4,
+            reproducibility,
             r"(?:frontier )?reconstruction package",
         ),
         "stale_seven_point_claim_absent": not contains(
             section_5,
             r"seven[-\s]+(?:non[-\s]*)?dominated operating points|older seven-point frontier",
         ),
-        "stale_cutoff_endpoint_absent": not contains(section_5_4, r"71f5115"),
+        "stale_cutoff_endpoint_absent": not contains(reproducibility, r"71f5115"),
         "coordination_language_absent": not contains(
             section_5,
             r"pending coauthor confirmation|pending confirmation by the coauthors|ready to paste|candidate cut",
@@ -149,9 +160,17 @@ def locate_section_pages(pdf_path: Path, pages: int) -> tuple[int | None, int | 
         page_text = run_text(
             ["pdftotext", "-f", str(page), "-l", str(page), str(pdf_path), "-"]
         )
-        if start_page is None and "Reproducibility of the Results" in page_text:
+        if start_page is None and re.search(
+            REPRODUCIBILITY_HEADING,
+            page_text,
+            flags=re.IGNORECASE | re.MULTILINE,
+        ):
             start_page = page
-        if start_page is not None and "Limitations, Safety" in page_text:
+        if start_page is not None and re.search(
+            LIMITATIONS_HEADING,
+            page_text,
+            flags=re.IGNORECASE | re.MULTILINE,
+        ):
             end_page = page
             break
     if start_page is not None and end_page is None:
@@ -166,7 +185,7 @@ def render_pages(
     end_page: int,
 ) -> list[str]:
     render_dir.mkdir(parents=True, exist_ok=True)
-    prefix = render_dir / "section-5-4"
+    prefix = render_dir / "reproducibility"
     subprocess.run(
         [
             "pdftoppm",
@@ -184,7 +203,7 @@ def render_pages(
     )
     return [
         str(path.resolve())
-        for path in sorted(render_dir.glob("section-5-4-*.png"))
+        for path in sorted(render_dir.glob("reproducibility-*.png"))
     ]
 
 
@@ -214,8 +233,8 @@ def verify_pdf(pdf_path: Path, render_dir: Path | None = None) -> dict[str, Any]
         "pdf": str(pdf_path.resolve()),
         "sha256": hashlib.sha256(pdf_path.read_bytes()).hexdigest(),
         "pages": pages,
-        "section_5_4_page_start": start_page,
-        "section_5_4_page_end": end_page,
+        "reproducibility_page_start": start_page,
+        "reproducibility_page_end": end_page,
         "checks": checks,
         "content_checks_passed": all(checks.values()),
         "urls_checked": True,
