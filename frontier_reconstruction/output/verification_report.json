@@ -1,0 +1,343 @@
+{
+  "api_checkpoint_comparison": {
+    "changed_rows": [
+      {
+        "differences": {
+          "commit_sha": {
+            "checkpoint": null,
+            "pinned_response": "285741885e944a350fb5bfc22cbe0d5927abea0a"
+          },
+          "improved": {
+            "checkpoint": null,
+            "pinned_response": false
+          },
+          "official_metrics": {
+            "checkpoint": [
+              null,
+              null
+            ],
+            "pinned_response": [
+              828,
+              448102916
+            ]
+          },
+          "official_score": {
+            "checkpoint": null,
+            "pinned_response": 371029214448
+          },
+          "rejection_reason": {
+            "checkpoint": null,
+            "pinned_response": "score did not improve current best"
+          },
+          "status": {
+            "checkpoint": "validating",
+            "pinned_response": "rejected"
+          },
+          "updated": {
+            "checkpoint": "2026-06-25T06:14:05.020Z",
+            "pinned_response": "2026-06-25T06:32:22.895Z"
+          }
+        },
+        "full_id": "39a9b5ff-3649-42bf-8ff3-9e7256605196",
+        "submission": "39a9b5f"
+      }
+    ],
+    "checkpoint_rows": 763,
+    "missing_ids": [],
+    "retained_in_pinned_response": 763,
+    "supports_retention_but_not_exhaustiveness": true,
+    "unchanged_common_field_rows": 762
+  },
+  "api_response": {
+    "all_metric_scores_equal_q_times_t": true,
+    "byte_identical_readback_at": null,
+    "byte_identical_readback_query": null,
+    "declared_population_complete_by_definition": true,
+    "historical_database_exhaustiveness_claimed": false,
+    "metric_rows": 581,
+    "metric_rows_at_data_cutoff": 576,
+    "population_definition": "Rows present in the pinned 27 July API response whose createdAt timestamp is on or before the final API update of the first promoted 50%-threshold crossing.",
+    "pre_cut_rows_updated_after_cut": 0,
+    "raw_rows": 831,
+    "raw_rows_at_data_cutoff": 826,
+    "retained_pre_cut_rows_unchanged_by_updated_at": true,
+    "retrospective_completeness_proven": false,
+    "retrospective_limitations": [
+      "The 2026-07-27 response cannot rule out a row created by 2026-07-26 and deleted before the fetch.",
+      "The response has no pagination or completeness metadata.",
+      "A contemporaneous 2026-07-26 export or a maintainer append-only contract is required for an exhaustive historical claim."
+    ]
+  },
+  "chronology_reconciliation": {
+    "commit_mismatches": [
+      {
+        "official_commit": "01260e8a9f2138462a086813425217496bb596b9",
+        "published_commit": "1.26E+11",
+        "submission": "37816e7"
+      },
+      {
+        "official_commit": "0230031c0b28232e197b35aa39e4c32a78d7288b",
+        "published_commit": "230031",
+        "submission": "6bb7ab2"
+      }
+    ],
+    "repaired_ids": [
+      {
+        "official": "0620443",
+        "published": "620443"
+      },
+      {
+        "official": "37816e7",
+        "published": "3.78e+11"
+      }
+    ],
+    "rows": 80,
+    "unresolved_ids": []
+  },
+  "data_cutoff": {
+    "best_promoted_score_before_crossing": 1496889858,
+    "created_at": "2026-07-26T09:19:38.895Z",
+    "criterion": "First promoted submission with official score at or below 50% of the paper's Google comparison score.",
+    "cutoff_metrics": {
+      "api_status": "accepted",
+      "created_at": "2026-07-26T09:19:38.895Z",
+      "promotion_status": "promoted",
+      "q": 1151,
+      "qt": 1495670403,
+      "solver": "gopikannappan",
+      "source_commit": "60d61859fa6965eba53634f91877b1141a6f9dce",
+      "submission": "8e9c9a2",
+      "submission_commit": "ae7676ddb082a83b83b48a4a773987b32c5e6009",
+      "submission_uuid": "8e9c9a22-a6ec-4950-8c5b-c12aade0bc8e",
+      "t": 1299453,
+      "updated_at": "2026-07-26T09:21:55.494Z"
+    },
+    "data_cutoff_covers_final_api_update": true,
+    "final_api_update_at": "2026-07-26T09:21:55.494Z",
+    "first_crossing_verified": true,
+    "margin_below_threshold": 579597,
+    "reference_q": 1425,
+    "reference_score": 2992500000,
+    "reference_t": 2100000,
+    "source_commit": "60d61859fa6965eba53634f91877b1141a6f9dce",
+    "status": "confirmed",
+    "submission_id": "8e9c9a2",
+    "submission_uuid": "8e9c9a22-a6ec-4950-8c5b-c12aade0bc8e",
+    "threshold_score": 1496250000
+  },
+  "data_cutoff_at": "2026-07-26T09:21:55.494Z",
+  "live_reconciliation": {
+    "frozen_endpoint": {
+      "api_status": "accepted",
+      "created_at": "2026-07-26T09:19:38.895Z",
+      "promotion_status": "promoted",
+      "q": 1151,
+      "qt": 1495670403,
+      "solver": "gopikannappan",
+      "source_commit": "60d61859fa6965eba53634f91877b1141a6f9dce",
+      "submission": "8e9c9a2",
+      "submission_commit": "ae7676ddb082a83b83b48a4a773987b32c5e6009",
+      "submission_uuid": "8e9c9a22-a6ec-4950-8c5b-c12aade0bc8e",
+      "t": 1299453,
+      "updated_at": "2026-07-26T09:21:55.494Z"
+    },
+    "live_endpoint_at_fetch": {
+      "api_status": "accepted",
+      "created_at": "2026-07-27T10:46:47.030Z",
+      "promotion_status": "promoted",
+      "q": 1154,
+      "qt": 1491298044,
+      "solver": "gopikannappan",
+      "source_commit": "6e9f0af126557eb345fdbcc7ae733f71db5ba206",
+      "submission": "4c5a972",
+      "submission_commit": "5eb22e43cac68badb4d53761fa8f1935f3d54492",
+      "submission_uuid": "4c5a9722-9a6a-449c-a98c-5464a7c75101",
+      "t": 1292286,
+      "updated_at": "2026-07-27T10:49:06.120Z"
+    },
+    "live_is_context_only": true,
+    "same_q": false,
+    "score_reduction": 4372359,
+    "score_reduction_percent": 0.2923,
+    "toffoli_reduction": 7167,
+    "toffoli_reduction_percent": 0.5515
+  },
+  "note_rule_sensitivity": {
+    "expected_ids": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "05f3483",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "matches_pinned_expectation": true,
+    "mechanically_note_admitted_rejected_rows": 80,
+    "note_only_ids_after_refrontiering": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "05f3483"
+    ],
+    "official_only_ids": [
+      "ddb641a",
+      "3bd88ad",
+      "71b9cc4"
+    ],
+    "pareto_ids": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "05f3483",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ]
+  },
+  "paper_admitted_pareto": {
+    "actual_ids": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "a3b0148",
+      "4352cfb",
+      "1c0e0e9",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "differs_from_api_metric_rule": true,
+    "expected_ids": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "a3b0148",
+      "4352cfb",
+      "1c0e0e9",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "matches_configured_expectation": true,
+    "official_only_ids": [
+      "ddb641a",
+      "425ac95",
+      "84e5896",
+      "3bd88ad",
+      "53dc92c",
+      "f19e8a1",
+      "3d9ce59",
+      "3ab4f86",
+      "71b9cc4",
+      "fa3bb03",
+      "8155bb8"
+    ],
+    "paper_only_ids_after_refrontiering": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "4352cfb"
+    ]
+  },
+  "pinned_response_api_metrics_pareto": {
+    "actual_ids": [
+      "ddb641a",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "3bd88ad",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "71b9cc4",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "expected_ids": [
+      "ddb641a",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "3bd88ad",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "71b9cc4",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "matches_pinned_expectation": true
+  },
+  "publication_policy": {
+    "api_metrics_imply_validator_clean": false,
+    "historical_database_exhaustiveness_claimed": false,
+    "population_definition": "Rows present in the pinned 27 July API response whose createdAt timestamp is on or before the final API update of the first promoted 50%-threshold crossing.",
+    "primary_result": "The paper-admitted set preserves the six selected note-supported low-Q rows and includes all promoted Pareto points through the confirmed data cutoff. Broader API-metric and public-note-parser sets remain sensitivity calculations.",
+    "status": "confirmed_for_paper"
+  },
+  "reconstructed_from_snapshot_fetched_at": "2026-07-27T16:16:01Z",
+  "schema_version": 6,
+  "source_checks": {
+    "api_checkpoint": {
+      "hash_matches": true,
+      "path": "data/raw/pareto_mirror_checkpoint_2026-06-25T061405Z.json",
+      "sha256": "c40e37d5995c9fd5a74dc831bdeb125802cbf987859a42c172fd91997ed9413b"
+    },
+    "chronology": {
+      "hash_matches": true,
+      "path": "data/raw/teddy_contribution_chronology_2026-07-02.csv",
+      "sha256": "cf267b72cec67b850a0cf1ec9bcf3390077a9945ebf6d009088b7b89029bc255"
+    },
+    "official_submissions": {
+      "hash_matches": true,
+      "path": "data/raw/official_submissions_2026-07-27T161558Z.json",
+      "sha256": "915af8b7be4283dbd357d5e8ed013d91c494e81fcee6528aa3dc1385706aebec"
+    }
+  },
+  "transition_slice": {
+    "count": 15,
+    "ids": [
+      "30c8ded",
+      "f94f726",
+      "0620443",
+      "0c1d4d9",
+      "744b274",
+      "ca1cd1f",
+      "4b7d727",
+      "44d7d51",
+      "6c1a65d",
+      "71f5115",
+      "8e9c9a2",
+      "0ce9b13",
+      "a77c9da",
+      "39a9b5f",
+      "b6f2b0a"
+    ],
+    "within_selected_display_range": true
+  }
+}

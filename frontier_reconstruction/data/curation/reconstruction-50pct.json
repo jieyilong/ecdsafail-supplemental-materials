@@ -1,0 +1,196 @@
+{
+  "schema_version": 6,
+  "data_cutoff_at": "2026-07-26T09:21:55.494Z",
+  "data_cutoff": {
+    "status": "confirmed",
+    "criterion": "First promoted submission with official score at or below 50% of the paper's Google comparison score.",
+    "reference_q": 1425,
+    "reference_t": 2100000,
+    "reference_score": 2992500000,
+    "threshold_score": 1496250000,
+    "submission_id": "8e9c9a2",
+    "submission_uuid": "8e9c9a22-a6ec-4950-8c5b-c12aade0bc8e",
+    "source_commit": "60d61859fa6965eba53634f91877b1141a6f9dce",
+    "created_at": "2026-07-26T09:19:38.895Z",
+    "final_api_update_at": "2026-07-26T09:21:55.494Z"
+  },
+  "sources": {
+    "official_submissions": {
+      "path": "data/raw/official_submissions_2026-07-27T161558Z.json",
+      "endpoint": "https://api.ecdsa.fail/api/benchmarks/1ffb695a-309b-46b6-a728-2f97d8c7be74/submissions",
+      "fetched_at": "2026-07-27T16:16:01Z",
+      "sha256": "915af8b7be4283dbd357d5e8ed013d91c494e81fcee6528aa3dc1385706aebec",
+      "expected_rows": 831
+    },
+    "api_checkpoint": {
+      "path": "data/raw/pareto_mirror_checkpoint_2026-06-25T061405Z.json",
+      "captured_at": "2026-06-25T06:14:05Z",
+      "source_repository": "https://github.com/welttowelt/pareto-mirror",
+      "source_commit": "c44ee5f04bbce74aa26a73c664914b7a449a0d84",
+      "sha256": "c40e37d5995c9fd5a74dc831bdeb125802cbf987859a42c172fd91997ed9413b",
+      "expected_rows": 763
+    },
+    "chronology": {
+      "path": "data/raw/teddy_contribution_chronology_2026-07-02.csv",
+      "document_url": "https://docs.google.com/document/d/1-yth9tqrwfegsDMsQT9oHz388aP8mxqIFDSr3WxKUfs/edit?tab=t.0",
+      "published_csv_url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOdImD7IZYBnzIm2_W-tt0HKNwrYsIGyMUR5Y7y8wEIZVfh5yFr14DknwemkZGx5KMV81z5ZLtPHSU/pub?output=csv",
+      "sha256": "cf267b72cec67b850a0cf1ec9bcf3390077a9945ebf6d009088b7b89029bc255",
+      "expected_rows": 80
+    }
+  },
+  "publication_policy": {
+    "status": "confirmed_for_paper",
+    "population_definition": "Rows present in the pinned 27 July API response whose createdAt timestamp is on or before the final API update of the first promoted 50%-threshold crossing.",
+    "historical_database_exhaustiveness_claimed": false,
+    "api_metrics_imply_validator_clean": false,
+    "primary_result": "The paper-admitted set preserves the six selected note-supported low-Q rows and includes all promoted Pareto points through the confirmed data cutoff. Broader API-metric and public-note-parser sets remain sensitivity calculations."
+  },
+  "admission_policy": {
+    "primary_rule": "For the paper-admitted set, include promoted rows and the six rejected low-Q rows selected for the paper. This reproduces the paper's evidentiary choice but does not derive a general exclusion rule for every archived row.",
+    "deduplication": "For duplicate Q,T coordinates, retain the earliest created row.",
+    "pinned_response_api_metric_pareto_ids_q_ascending": [
+      "ddb641a",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "3bd88ad",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "71b9cc4",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "note_sensitivity_rule": "Include promoted rows and rejected rows whose public note names all three evaluator channels and explicitly records a complete 9,024-instance run with zero classical, phase, and ancilla failures. Generic all-shots-OK prose is insufficient.",
+    "note_sensitivity_pareto_ids_q_ascending": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "05f3483",
+      "425ac95",
+      "a3b0148",
+      "84e5896",
+      "53dc92c",
+      "f19e8a1",
+      "1c0e0e9",
+      "3d9ce59",
+      "3ab4f86",
+      "fa3bb03",
+      "8155bb8",
+      "8e9c9a2",
+      "a536a48"
+    ],
+    "paper_admitted_rule": "Include all promoted rows through the data cutoff and only the six rejected IDs selected for the paper, each of which has an explicit public 9,024-instance zero-failure note.",
+    "paper_admitted_curated_rejected_ids": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "a3b0148",
+      "4352cfb",
+      "1c0e0e9"
+    ],
+    "paper_admitted_pareto_ids_q_ascending": [
+      "b6f2b0a",
+      "f1d8707",
+      "39a9b5f",
+      "a3b0148",
+      "4352cfb",
+      "1c0e0e9",
+      "8e9c9a2",
+      "a536a48"
+    ]
+  },
+  "figure": {
+    "paper_primary_set": "paper_admitted",
+    "paper_title": "Frontier at the 50% data cutoff",
+    "paper_subtitle": "15 selected transitions; 8 admitted Pareto points",
+    "paper_primary_label": "admitted Pareto set",
+    "paper_footer": "Data cutoff: 26 Jul 09:21 UTC; pinned response; non-exhaustive.",
+    "sensitivity_title": "Inclusion-rule sensitivity at the 50% data cutoff"
+  },
+  "transition_slice": [
+    {
+      "id": "30c8ded",
+      "track": "product",
+      "selection_basis": "Initial promoted baseline selected for the paper's historical display."
+    },
+    {
+      "id": "f94f726",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "0620443",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "0c1d4d9",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "744b274",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "ca1cd1f",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "4b7d727",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "44d7d51",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "6c1a65d",
+      "track": "product",
+      "selection_basis": "Product milestone selected in Teddy Pender's chronology table."
+    },
+    {
+      "id": "71f5115",
+      "track": "product",
+      "selection_basis": "Product milestone at the 2 July chronology cut."
+    },
+    {
+      "id": "8e9c9a2",
+      "track": "product",
+      "selection_basis": "First promoted submission at or below the confirmed 50% comparison threshold, selected from the official API."
+    },
+    {
+      "id": "0ce9b13",
+      "track": "low_q",
+      "selection_basis": "Low-qubit foreground row selected for the paper's historical display."
+    },
+    {
+      "id": "a77c9da",
+      "track": "low_q",
+      "selection_basis": "Low-qubit foreground row selected for the paper's historical display."
+    },
+    {
+      "id": "39a9b5f",
+      "track": "low_q",
+      "selection_basis": "Low-qubit foreground row selected for the paper's historical display."
+    },
+    {
+      "id": "b6f2b0a",
+      "track": "low_q",
+      "selection_basis": "Low-qubit foreground row selected for the paper's historical display."
+    }
+  ],
+  "live_reference": {
+    "benchmark_ref": "1ffb695a-309b-46b6-a728-2f97d8c7be74",
+    "expected_tip_at_fetch": "4c5a972"
+  }
+}

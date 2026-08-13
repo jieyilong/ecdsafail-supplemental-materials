@@ -1,0 +1,4 @@
+# Pinned public snapshots must remain byte-for-byte stable across checkouts.
+frontier_reconstruction/data/raw/* -text -diff
+frontier_reconstruction/output/*.pdf -text -diff
+frontier_reconstruction/output/*.png -text -diff
