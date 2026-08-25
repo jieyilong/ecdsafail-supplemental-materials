@@ -1,0 +1,10 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.los
+*.out
+*.pdf
+*.synctex.gz
+*.toc

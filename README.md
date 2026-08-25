@@ -5,7 +5,8 @@ Supplemental materials for the ECDSA.Fail paper.
 ## Contents
 
 - [`appendices/`](appendices/): detailed results, optimization taxonomy, and
-  the accepted-solution census.
+  the accepted-solution census, as PDFs, with their LaTeX sources in
+  [`appendices/tex/`](appendices/tex/).
 - [`circuit_details/`](circuit_details/): technical notes for selected circuit
   implementations.
 - [`frontier_reconstruction/`](frontier_reconstruction/): frozen public data,
