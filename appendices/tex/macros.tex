@@ -1,0 +1,64 @@
+% ===== macros.tex =====
+% Draft switch: reuse the \allow flag already in main.tex (1 = show notes)
+\newif\ifdraft
+\ifnum\allow=1 \drafttrue \else \draftfalse \fi
+
+% Define note colors explicitly (robust even if xcolor lacks dvipsnames)
+\providecolor{Maroon}{HTML}{9E1B32}
+\providecolor{Peach}{HTML}{E58F65}
+\providecolor{SkyBlue}{HTML}{6FA8DC}    
+\providecolor{Bittersweet}{HTML}{FE6F5E}
+\providecolor{BenHuangGreen}{HTML}{2E8B57}
+\providecolor{Bartosz}{HTML}{AAAC11}
+\providecolor{FrancescoBlue}{HTML}{345995}
+\providecolor{PierreLucOrange}{HTML}{FCA503}
+
+\ifdraft
+  \newcommand{\fixme}[1]{\noindent\colorbox{yellow}{\scriptsize\textbf{FIXME}}\,%
+      \textbf{\textcolor{Maroon}{#1}}}
+  \newcommand{\todo}[1]{\noindent\colorbox{yellow}{\scriptsize\textbf{TODO}}\,%
+      \textbf{\textcolor{Maroon}{#1}}}
+  % one helper, one line per co-author -> \manuel{...}, \jieyi{...}, etc.
+  \newcommand{\authornote}[3]{\colorbox{#2}{\scriptsize\textbf{#1}}\,%
+      {\textcolor{#2}{#3}}}
+  \newcommand{\manuel}[1]{\authornote{MANUEL}{Peach}{#1}}
+  \newcommand{\jieyi}[1]{\authornote{JIEYI}{SkyBlue}{#1}}
+  \newcommand{\teddy}[1]{\authornote{TEDDY}{Bittersweet}{#1}}
+  \newcommand{\samrendra}[1]{\authornote{SAMRENDRA}{Maroon}{#1}}
+  \newcommand{\benhuang}[1]{\authornote{BENHUANG}{BenHuangGreen}{#1}}
+  \newcommand{\bartosz}[1]{\authornote{BARTOSZ}{Bartosz}{#1}}
+  \newcommand{\francesco}[1]{\authornote{FRANCESCO}{FrancescoBlue}{#1}}
+  \newcommand{\pierreluc}[1]{\authornote{PIERRELUC}{PierreLucOrange}{#1}}
+
+  % ... add the other 8 authors the same way
+\else
+  \newcommand{\fixme}[1]{}\newcommand{\todo}[1]{}
+  \newcommand{\manuel}[1]{}\newcommand{\jieyi}[1]{}
+  \newcommand{\benhuang}[1]{}
+  \newcommand{\francesco}[1]{}
+  \newcommand{\pierreluc}[1]{}
+  % ... matching empty defs for every author macro
+\fi
+
+% Quantum bra-ket notation (guarded: only define if not already provided by a
+% package such as physics/braket). secp256k1 sections use \ket/\bra freely.
+\providecommand{\ket}[1]{\ensuremath{\left\lvert #1\right\rangle}}
+\providecommand{\bra}[1]{\ensuremath{\left\langle #1\right\rvert}}
+\providecommand{\braket}[2]{\ensuremath{\left\langle #1\middle\vert #2\right\rangle}}
+
+% Paper-wide content macros
+\providecommand{\challengename}{ECDSA.Fail}
+\providecommand{\challengenametitle}{ECDSA.Fail}
+
+% Shared TikZ palette for the loop figures (define once, used by both)
+\definecolor{arInk}{HTML}{22262E}   \definecolor{arMuted}{HTML}{6B7280}
+\definecolor{arAccent}{HTML}{3D5A80} \definecolor{arAccentBg}{HTML}{E9EEF5}
+\definecolor{arWarm}{HTML}{B07D3B}   \definecolor{arWarmBg}{HTML}{F7EEDE}
+\definecolor{arBorder}{HTML}{C9CED6} \definecolor{arEdge}{HTML}{7A828E}
+
+% commit references
+% @TODOL: update when we centralize the commits
+\providecommand{\commitref}[2]{%
+  \href{https://github.com/manel1874/ecdsafail-challenge/commit/#2}%
+       {\texttt{#1}}%
+}

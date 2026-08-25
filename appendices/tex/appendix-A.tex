@@ -1,0 +1,48 @@
+%% Standalone build of Appendix A of the ECDSA.Fail paper.
+%%
+%% Build (three passes; bibtex is needed for the citations):
+%%     pdflatex appendix-A && bibtex appendix-A \
+%%       && pdflatex appendix-A && pdflatex appendix-A
+%%
+%% Requires the LNCS package for llncs.cls and splncs04.bst; on TeX Live
+%% install it with:  tlmgr install llncs   (or tlmgr --usermode install llncs)
+%%
+%% Produces appendix-A.pdf, published in this repository as
+%%     ../detailed_results_and_circuit_improvement_trajectory.pdf
+%%
+%% The section body lives in appendix-A-content.tex and the main paper's
+%% numbering in main-refs.tex. Upstream both are generated from the paper
+%% source by the paper repository's tools/sync-appendix-pdfs.py; the copies
+%% here are a snapshot of that output, so edits made in this repository do
+%% not flow back into the paper.
+\input{preamble}
+\documentclass[envcountsame,runningheads,notitlepage]{llncs}
+\input{preamble-body}
+\hypersetup{pdftitle={ECDSA.Fail Appendix A: Detailed Results and Circuit-Improvement Trajectory},
+  pdfsubject={Supplementary material for ECDSA.Fail: Open Autoresearch for
+    Optimizing Elliptic-Curve Point Addition in Shor's Algorithm}}
+%% Numbering of the main paper, so references into it render as real numbers
+%% (\newlabel is a preamble-only command, hence its placement here).
+\input{main-refs}
+\begin{document}
+\begin{center}
+  {\large\bfseries Appendix A\par}
+  \vspace{0.9em}
+  {\small Supplementary material for\\[0.25em]
+   \emph{ECDSA.Fail: Open Autoresearch for Optimizing Elliptic-Curve Point Addition in Shor's Algorithm}\\[1.0em]
+   \begin{minipage}{0.86\linewidth}\small\itshape\raggedright
+   This document reproduces Appendix~A\ of the paper.
+   Section, figure, and table numbers are those of the main paper, so a
+   reference such as \emph{Section 5.2.3} or \emph{Table 5} carries the same
+   number in both documents. References to material outside Appendix~A\
+   resolve in the main paper.
+   \end{minipage}\par}
+\end{center}
+\vspace{1.5em}
+\appendix
+\setcounter{table}{4}
+\setcounter{section}{0}
+\input{appendix-A-content}
+\bibliographystyle{splncs04}
+\bibliography{refs}
+\end{document}
