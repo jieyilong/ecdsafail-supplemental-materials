@@ -135,7 +135,9 @@ this track is selected for explanatory contrast, it supports mechanism
 comparison rather than frequency estimates over all low-width submissions.
 
 The \emph{admitted $(Q,T)$ Pareto set} is the only one of these constructions
-that is a frontier in the usual multi-objective sense. If $\mathcal{A}$ denotes the admitted rows, then
+that is a frontier in the usual multi-objective sense: it collects the admitted
+rows that no other admitted row dominates on both $Q$ and $T$, in the formal
+sense stated in the main text.
 %
 \iffalse % The formal Pareto definition is retained in the main text.
 \begin{equation}
@@ -430,8 +432,8 @@ identification of the episode's isolated effect.
 
 The union-bound interpretation of the longitudinal proxy requires an explicit
 scope condition. If $e$ were the applicable per-addition error probability, the
-union bound would give $1-28e$ as a lower bound on success. The plotted
-$\hat p'_{\mathrm{LB}}$ instead substitutes the empirical
+union bound would give $1-28e$ as a lower bound on success. The $\hat p'_{\mathrm{LB}}$ plotted in
+\Cref{M:fig:qxt-shor-comparison} instead substitutes the empirical
 $1-\hat p$ for $e$: it is a descriptive plug-in proxy, not a confidence bound,
 and $\hat p$ measures classical-output agreement rather than coherent circuit
 success. Only under an independently rerunnable success model would a $5\%$
