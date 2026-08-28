@@ -1,5 +1,7 @@
 # QxT Track Circuit 8e9c9a2
 
+> The paper cites this note as **Supplemental Note D**.
+
 This directory is the canonical output location for figures, source files, and other supplemental materials related to ECDSA.Fail submission `8e9c9a2`.
 
 The primary diagram artifacts are:

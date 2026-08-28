@@ -1,5 +1,7 @@
 # Window-Compatible 8e9c9a2 Circuit
 
+> The paper cites this note as **Supplemental Note F**.
+
 This directory documents the runtime-table, coherently addressed adaptation of ECDSA.Fail submission `8e9c9a2`.
 
 - `windowed_QxT_track_circuit_8e9c9a2_details.tex` contains the technical note source.
