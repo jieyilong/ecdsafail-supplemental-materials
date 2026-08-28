@@ -20,28 +20,29 @@ empirical result is therefore an archive-conditioned set of operating points and
 transitions, not a winning number or a continuously reconstructed resource
 surface.
 
-Unless stated otherwise, quantitative archive claims in this section use the
-public-ledger snapshot of 2 July 2026. A six-row source audit completed on 12
-July changes the attribution of several mechanisms but not the operating points
-reported here. This fixed data cutoff explains small differences from later
-headline records quoted elsewhere in the evolving paper.
+Unless stated otherwise, quantitative archive claims in this note use the
+paper's data cutoff of 26 July 2026, 09:21:55 UTC. A six-row source audit
+completed on 12 July changes the attribution of several mechanisms but not the
+operating points reported here.
 
 Within that snapshot, the first promoted baseline, submission
 \texttt{30c8ded}, used $2{,}715$ peak logical qubits and $3{,}960{,}753$
 average executed Toffoli gates, for a score of $10{,}753{,}444{,}395$. The best
-product-score submission in the same record, \texttt{71f5115}, used $1{,}152$
-qubits and $1{,}364{,}230$ average executed Toffoli gates, for a score of
-$1{,}571{,}592{,}960$. Relative to the baseline, peak width fell by $57.6\%$,
-average executed Toffoli by $65.6\%$, and the product objective by $85.4\%$, a
-$6.84$-fold improvement. The same row is also the lowest-Toffoli promoted
-circuit in this data cutoff. This conjunction records where the
-product-oriented search finished; it does not imply that the two objectives are
-generally aligned.
+product-score submission in the same record, \texttt{8e9c9a2}, used $1{,}151$
+qubits and $1{,}299{,}453$ average executed Toffoli gates, for a score of
+$1{,}495{,}670{,}403$. Relative to the baseline, peak width fell by $57.6\%$,
+average executed Toffoli by $67.2\%$, and the product objective by $86.1\%$, a
+$7.19$-fold improvement. The lowest-Toffoli promoted circuit in this data cutoff
+is a different row, \texttt{a536a48}, at $1{,}158$ qubits and $1{,}292{,}651$
+average executed Toffoli: seven further qubits coincide with $6{,}802$ fewer
+gates, so the product tip and the Toffoli tip do not coincide. This separation
+records where the product-oriented search finished; it does not imply that the
+two objectives are generally aligned.
 
 The lowest-width admitted validator-clean circuit lies on a different branch.
 Submission \texttt{b6f2b0a} reached $825$ logical qubits while requiring
-$489{,}161{,}900$ average executed Toffoli gates, approximately $359$ times the
-count of \texttt{71f5115}. Its product score is correspondingly poor, but the
+$489{,}161{,}900$ average executed Toffoli gates, approximately $376$ times the
+count of \texttt{8e9c9a2}. Its product score is correspondingly poor, but the
 row is scientifically informative: it demonstrates a validator-clean
 implementation of the point-addition primitive at a width far below the
 product-score incumbent when transcript, quotient, and route information are
@@ -83,7 +84,8 @@ evidential meaning.
     \textbf{$T$} & \textbf{$QT$} \\
     \midrule
     Initial promoted baseline & \texttt{30c8ded} & $2{,}715$ & $3{,}960{,}753$ & $10{,}753{,}444{,}395$ \\
-    Product-score endpoint & \texttt{71f5115} & $1{,}152$ & $1{,}364{,}230$ & $1{,}571{,}592{,}960$ \\
+    Lowest-$T$ promoted point & \texttt{a536a48} & $1{,}158$ & $1{,}292{,}651$ & $1{,}496{,}889{,}858$ \\
+    Product-score endpoint & \texttt{8e9c9a2} & $1{,}151$ & $1{,}299{,}453$ & $1{,}495{,}670{,}403$ \\
     Low-$Q$/score bridge & \texttt{1c0e0e9} & $1{,}133$ & $1{,}460{,}511$ & $1{,}654{,}758{,}963$ \\
     Near-$1{,}000$ clean route & \texttt{a77c9da} & $1{,}019$ & $31{,}051{,}277$ & $31{,}641{,}251{,}263$ \\
     Sub-$1{,}000$ Pareto point & \texttt{4352cfb} & $980$ & $28{,}847{,}321$ & $28{,}270{,}374{,}580$ \\
@@ -91,7 +93,7 @@ evidential meaning.
     Lowest admitted width & \texttt{b6f2b0a} & $825$ & $489{,}161{,}900$ & $403{,}558{,}567{,}500$ \\
     \bottomrule
   \end{tabular}
-  \caption{Representative operating points in the 2 July data cutoff. $Q$ is
+  \caption{Representative operating points in the 26 July data cutoff. $Q$ is
   peak logical width and $T$ is average executed Toffoli. Rejected rows are used
   only when admitted under the validation-evidence rule above.}
   \label{tab:headline-operating-points}
@@ -113,7 +115,7 @@ Pareto set at the data cutoff. Keeping them distinct avoids using
 ``frontier'' for three mathematically different objects.
 
 The \emph{product-score incumbent sequence} comprises promoted submissions that
-reduced $Q \times T$ when submitted. It culminates at \texttt{71f5115} and captures the
+reduced $Q \times T$ when submitted. It culminates at \texttt{8e9c9a2} and captures the
 main trajectory of the public leaderboard. Its largest architectural movements
 came from decomposing peak width into named owners, folding and hosting
 inversion transcripts, compressing branch-local control, and releasing carries
@@ -146,9 +148,9 @@ that is a frontier in the usual multi-objective sense. If $\mathcal{A}$ denotes 
 \end{equation}
 \fi
 %
-At the data cutoff this set contains seven non-dominated operating points: six
+At the data cutoff this set contains eight non-dominated operating points: six
 rejected low-$Q$ rows supported by full-validation notes admitted under the
-curation rule, and the promoted product tip. The public branch and submission
+curation rule, and the two promoted rows at the product tip. The public branch and submission
 model retained these artifacts even though a winner-only leaderboard would
 have discarded them, exposing otherwise hidden trade-offs and resource
 obstructions.
@@ -182,8 +184,9 @@ The trade-offs in \Cref{M:tab:admitted-pareto} are highly non-uniform. Moving fr
 $826$ to $828$ qubits coincides with $31{,}234{,}512$ fewer average executed
 Toffoli gates, approximately $15.6$ million per added qubit. Moving from $980$
 to $1{,}133$ qubits coincides with a reduction of more than $27$ million
-Toffoli, whereas the final nineteen-qubit movement from $1{,}133$ to $1{,}152$
-coincides with only $96{,}281$ fewer. These secant rates are not causal marginal
+Toffoli, whereas the eighteen-qubit movement from $1{,}133$ to $1{,}151$
+coincides with only $161{,}058$ fewer and the final seven-qubit movement to
+$1{,}158$ with only $6{,}802$. These secant rates are not causal marginal
 effects or theoretical lower bounds: the points arise from different route
 families. They nevertheless provide evidence for a steep hard-$Q$ transition
 among the observed routes.
@@ -204,7 +207,7 @@ among those satisfying $Q\le q$.
     \toprule
     \textbf{Budget} & \textbf{Submission} & \textbf{$Q$} & \textbf{$T$} & \textbf{Status} \\
     \midrule
-    $1{,}200$ & \texttt{71f5115} & $1{,}152$ & $1{,}364{,}230$ & promoted \\
+    $1{,}200$ & \texttt{a536a48} & $1{,}158$ & $1{,}292{,}651$ & promoted \\
     $1{,}150$ & \texttt{1c0e0e9} & $1{,}133$ & $1{,}460{,}511$ & admitted \\
     $1{,}050$ & \texttt{4352cfb} & $980$ & $28{,}847{,}321$ & admitted \\
     $1{,}000$ & \texttt{4352cfb} & $980$ & $28{,}847{,}321$ & admitted \\
@@ -214,7 +217,7 @@ among those satisfying $Q\le q$.
   \end{tabular}
   \caption{Minimum admitted average executed-Toffoli cost at or below selected
   peak-qubit budgets. ``Admitted'' follows the evidence rule in the main text;
-  only the scalar incumbent was promoted by the challenge.}
+  only the $1{,}200$ row was promoted by the challenge.}
   \label{tab:supp-fixed-budget-slices}
 \end{table}
 
@@ -265,7 +268,7 @@ operating points, not a ranking.
 \end{table}
 \fi
 
-The headline numbers for \texttt{71f5115} are lower on both axes than those
+The headline numbers for \texttt{8e9c9a2} are lower on both axes than those
 reported for the $1{,}175$-qubit Babbush et al.\ point and the open TrailMix
 \texttt{jump-lowqubit} route. This numerical ordering is not an ordering under a
 common measurement model. {\challengename} counts average executed Toffoli under
@@ -446,7 +449,7 @@ independent targets, a view that failed whenever several phases tied for the
 global maximum. Reducing one owner simply revealed another at the same height.
 
 The \texttt{d35d6e7} episode fused consecutive Kaliski $(r,s)$ controlled swaps
-across an iteration boundary (\Cref{M:sec:fam-fusion}). Its immediate width effect
+across an iteration boundary (the \emph{fusion} family of Supplemental Note~B). Its immediate width effect
 was modest, but it established that a control value need not be materialized
 twice when its forward and reverse lifetimes can be joined exactly.
 
@@ -742,7 +745,7 @@ The trajectory is therefore an interacting sequence rather than a collection
 of independent tricks. Joint-peak analysis made transcript residency visible;
 compression made branch-local provenance salient; measured cleanup made phase
 part of the resource contract; and low-width exploration made witness lifetime
-salient. The schema organizes both the $6.84$ score ratio and the
+salient. The schema organizes both the $7.19$ score ratio and the
 orders-of-magnitude work increase on the extreme-width branch, but neither
 decomposes those outcomes causally nor claims predictive completeness. The next
 subsection changes the analytical axis from chronology to transformation
