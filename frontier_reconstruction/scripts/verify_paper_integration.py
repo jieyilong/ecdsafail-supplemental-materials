@@ -117,12 +117,18 @@ def evaluate_text(text: str) -> dict[str, bool]:
             section_5,
             r"15 manifest-selected (?:historical points|transitions)",
         ),
+        # Searched over the whole document, not the Section 5 window: the
+        # admitted-Pareto table is a float, and when it is typeset at the top
+        # of the page that carries the Section 5 heading its rows precede that
+        # heading in extraction order and fall outside the window.
         "paper_admitted_ids_present": all(
-            contains(section_5, short_id) for short_id in PAPER_ADMITTED_IDS
+            contains(text, short_id) for short_id in PAPER_ADMITTED_IDS
         ),
+        # Matched on the invariant (an eight-point Pareto set) rather than on
+        # one phrasing of the figure caption, which is revised freely.
         "eight_point_figure_present": contains(
             section_5,
-            r"black polyline is the eight-point archive-conditioned Pareto set",
+            r"\beight\b[^.]{0,120}\bPareto\b",
         ),
         "artifact_reference_present": contains(
             reproducibility,

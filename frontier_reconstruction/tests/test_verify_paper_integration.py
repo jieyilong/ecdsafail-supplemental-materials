@@ -15,8 +15,9 @@ CURRENT_SECTION_5 = """
 5 Results and Findings
 
 Solutions on the Pareto frontier. Teal circles and orange diamonds show the
-15 manifest-selected historical points. The black polyline is the eight-point
-archive-conditioned Pareto set used in the paper.
+15 manifest-selected historical points. The thick black line and filled circles
+mark the admitted nondominated operating points at the cutoff, and the table
+lists the eight admitted Pareto points at the cutoff.
 
 b6f2b0a f1d8707 39a9b5f a3b0148 4352cfb 1c0e0e9 8e9c9a2 a536a48
 The data cutoff is 26 July 2026, 09:21:55 UTC. The promoted source commit is
@@ -72,6 +73,30 @@ class PaperIntegrationVerifierTest(unittest.TestCase):
         text = CURRENT_SECTION_5.replace("contains 831 rows", "contains 830 rows")
         checks = evaluate_text(text)
         self.assertFalse(checks["snapshot_counts_present"])
+
+    def test_accepts_admitted_table_floated_above_section_heading(self) -> None:
+        """The admitted-Pareto table is a float. When LaTeX places it at the top
+        of the page carrying the Section 5 heading, its rows are extracted
+        before that heading and so fall outside the Section 5 window."""
+        floated = CURRENT_SECTION_5.replace(
+            "b6f2b0a f1d8707 39a9b5f a3b0148 4352cfb 1c0e0e9 8e9c9a2 a536a48\n", ""
+        )
+        text = (
+            "b6f2b0a f1d8707 39a9b5f a3b0148 4352cfb 1c0e0e9 8e9c9a2 a536a48\n"
+            + floated
+        )
+        checks = evaluate_text(text)
+        self.assertTrue(checks["paper_admitted_ids_present"], checks)
+
+    def test_accepts_reworded_frontier_caption(self) -> None:
+        """The check must survive rewording of the figure caption, so long as
+        the paper still asserts an eight-point Pareto set."""
+        text = CURRENT_SECTION_5.replace(
+            "the table\nlists the eight admitted Pareto points at the cutoff.",
+            "the frontier holds eight admitted Pareto operating points.",
+        )
+        checks = evaluate_text(text)
+        self.assertTrue(checks["eight_point_figure_present"], checks)
 
     def test_rejects_missing_paper_admitted_point(self) -> None:
         text = CURRENT_SECTION_5.replace(" a536a48", "")
