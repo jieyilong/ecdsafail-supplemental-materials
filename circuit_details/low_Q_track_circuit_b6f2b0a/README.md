@@ -1,5 +1,7 @@
 # Low-Q circuit b6f2b0a
 
+> The paper cites this note as **Supplemental Note E**.
+
 This directory contains a source-grounded slide deck for ECDSA.Fail submission `b6f2b0a` (source commit `e6d9fa95ab81a3414517030c974e75349912e7ca`).
 
 The analysis uses an isolated restoration at:

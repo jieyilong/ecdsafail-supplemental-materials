@@ -5,7 +5,7 @@
 
 \Cref{M:sec:optimization-technique-breakdown} classified the $400$ scored source
 commits of the public competition into the nine optimization families and two
-residual buckets of \Cref{M:fig:family-census-tree}. This appendix supplies the
+residual buckets of \Cref{M:fig:family-census-tree}. This note supplies the
 mechanism-level anatomy behind that census: for each family, what the
 transformation does to the reversible circuit, which correctness obligation
 licenses it, which factor of the score $S=QT$ (\Cref{M:sec:cost}) it moves, and
@@ -19,7 +19,7 @@ and dead-code elimination (\Cref{M:sec:dead-code-elimination})---we do not repea
 that treatment, and record only the technique's placement in the taxonomy, its
 neighbouring mechanisms, and its commit-level record. The complete per-commit
 ledger, with each commit's joined leaderboard score, frontier delta,
-contestant, and date, is \Cref{M:tab:supp-census}.
+contestant, and date, is the census table of Supplemental Note~C.
 
 The archive records landed source transformations more reliably than it records
 who first conceived them. Accordingly, \emph{agent-identified} denotes
@@ -71,18 +71,18 @@ additional families. We order the subsections below by structural role rather
 than by frequency, leading with the skeleton-defining windowing family.
 
 \paragraph{Which commits each claim rests on.}
-This appendix draws on both halves of the source history defined in
+This note draws on both halves of the source history defined in
 \Cref{M:sec:optimization-technique-breakdown}. The census of
 \Cref{M:fig:family-census-tree} counts only the scored commits of the public
 competition and is reconciled against the public ledger in
-\Cref{M:sec:supp-census}; the technique-level discussion inside each family instead
+Supplemental Note~C; the technique-level discussion inside each family instead
 draws mainly on the earlier pre-competition commits, where the mechanism first
 becomes source-auditable.\footnote{The
 per-commit Toffoli and peak-qubit figures quoted in the family subsections below
 are source-reported local counts, typically measured on that technique's own
 primitive or working tree at the pre-competition commit where it landed (as
 recorded in the corresponding source audit), not the global operating points of
-\Cref{M:tab:headline-operating-points}. The working-tree peaks these deltas sit
+the headline table in Supplemental Note~A. The working-tree peaks these deltas sit
 on---often in the low thousands of logical qubits---therefore differ from the
 promoted submissions' headline widths, and most identifiers are pre-competition
 development hashes; where a competition submission hash is quoted (e.g.,
@@ -117,7 +117,7 @@ count them under their gate-removing mechanism but flag the integrity concern in
 
 \paragraph{A score-weighted view.}
 The census counts how \emph{often} each family was the primary move; the recovered
-leaderboard scores (\Cref{M:sec:supp-census}) also permit an accounting view of
+leaderboard scores (Supplemental Note~C) also permit an accounting view of
 realized frontier movement. Let $\Delta_i$ be the ledger's signed score change
 for entry $i$, so an improvement has $\Delta_i<0$. The $70$ largest reductions
 $-\Delta_i$ account for $91.6\%$ of the gross reduction across all $400$ scored
@@ -155,8 +155,8 @@ the scalar incumbent.
 In the accepted-commit census (\Cref{M:fig:family-census-tree}), windowing is the
 primary move in $8$ competition commits ($2.0\%$), led by the wholesale landing of
 the two-jump inversion base and its \texttt{K2} refinements; the family opens
-the anatomy because that small count carries the competition's largest single
-frontier movement. The windowed modular shift described below is the census's
+the anatomy because that small count carries the competition's second-largest
+single frontier movement. The windowed modular shift described below is the census's
 \emph{windowed carry/shift blocks} change-type---the primary move in the
 remaining $5$ of these $8$ commits; the specific Solinas-shift commits detailed
 below are first documented before the competition, while the same
